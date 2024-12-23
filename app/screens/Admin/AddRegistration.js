@@ -1,0 +1,589 @@
+import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native'
+import React, { useState } from 'react'
+import { styles } from '../../../styles/screens/DCAdmission'
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { RadioButton } from 'react-native-paper';
+import CategorySelectList from '../../components/CategorySelectList';
+import CustomInput from '../../components/CustomInput';
+import CustomButton from '../../components/CustomButton';
+import { router } from 'expo-router';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+const data = [
+    { key: '1', value: 'I', },
+    { key: '2', value: 'II' },
+    { key: '3', value: 'III' },
+    { key: '4', value: 'IV' },
+    { key: '5', value: 'V' },
+    { key: '6', value: 'VI' },
+    { key: '7', value: 'VII' },
+    { key: '8', value: 'VIII' },
+];
+
+const BloodGroupData = [
+    { key: '1', value: 'A+', },
+    { key: '2', value: 'A-' },
+    { key: '3', value: 'B+' },
+    { key: '4', value: 'B-' },
+    { key: '5', value: 'O+' },
+    { key: '6', value: 'O-' },
+    { key: '7', value: 'AB+' },
+    { key: '8', value: 'AB-' },
+];
+
+const CastData = [
+    { key: '1', value: 'GEN', },
+    { key: '2', value: 'EBC' },
+    { key: '3', value: 'BC' },
+    { key: '4', value: 'SC' },
+    { key: '5', value: 'ST' }
+];
+
+const AddRegistration = () => {
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [selectedDate, setSelectedDate] = useState("Select Date Of Birth");
+    const [value, setValue] = React.useState('');
+    const [selected, setSelected] = React.useState("");
+    const [text, onChangeText] = React.useState('');
+
+    const showDatePicker = () => {
+        setDatePickerVisibility(true);
+    };
+
+    const hideDatePicker = () => {
+        setDatePickerVisibility(false);
+    };
+
+    const handleConfirm = (dateVal) => {
+        const date = new Date(dateVal);
+
+        // Get the day, month, and year
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+        const year = date.getFullYear();
+
+        // Format as dd/mm/yyyy
+        const formattedDate = `${day}/${month}/${year}`;
+
+        setSelectedDate(formattedDate)
+        console.warn("A date has been picked: ", date);
+        hideDatePicker();
+    };
+    console.log("selected", selected)
+    return (
+        <ScrollView style={{ backgroundColor: "#fff", marginBottom: 20 }}>
+            <View style={styles.container}>
+
+
+                <View style={styles.formContent}>
+                    <Text style={styles.slNo}>Sl.No:- {'690'}</Text>
+                    <View>
+
+
+                        <View>
+
+
+                            <View style={[{ justifyContent: 'space-between', flexDirection: 'row' }]}>
+                                <View style={{ width: '80%' }}>
+                                    <CustomInput
+                                        title="UAN No."
+                                        required={true}
+                                        onChangeText={onChangeText}
+                                        value={text}
+
+                                        placeholder="Enter Student UAN No."
+                                        labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                        keyboardType={'default'}
+                                        badgeStyles={styles.badge}
+                                    />
+                                </View>
+                                <View style={styles.SearchButton}>
+                                    <TouchableOpacity onPress={() => console.log("Search")}>
+                                        <FontAwesome name="search" size={28} color="#fff" style={{ textAlign: 'center' }} />
+                                    </TouchableOpacity>
+
+                                </View>
+
+                            </View>
+                        </View>
+
+                        <View style={{ marginTop: 10 }}>
+                            <CustomInput
+                                title="C. No."
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter C. No."
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+                        </View>
+
+                        <Text style={styles.label}>
+                            Faculty/Course.<Text style={styles.badge}>*</Text>
+
+                        </Text>
+
+
+                        <View style={{ marginRight: 10 }}>
+
+                            <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
+                                <View style={styles.groupData}>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <RadioButton value="first" color='#690405' />
+                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>B.A</Text>
+
+                                    </View>
+
+
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <RadioButton value="second" color='#690405' />
+                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>B.SC</Text>
+
+                                    </View>
+
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <RadioButton value="third" color='#690405' />
+                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>B.Com.</Text>
+
+                                    </View>
+
+                                    {/*                                   
+                                    <RadioButton value="second" color='#690405' />
+                                    <Text style={styles.labelRedio}>B.SC</Text> */}
+
+                                    {/* <RadioButton value="third" color='#690405' />
+                                    <Text style={styles.labelRedio}>B.Com.</Text> */}
+
+                                </View>
+                            </RadioButton.Group>
+                        </View>
+
+                        <View>
+                            <CustomInput
+                                title="College Roll No."
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter College Roll No."
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+                        </View>
+
+                    </View>
+
+                    <View style={{ marginTop: 1, paddingRight: 10 }}>
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Name Of The Candidate"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Name Of The Candidate"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Father`s Name / Husband`s Name"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Father`s / Husband`s Name"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Mother`s Name / Husband`s Name"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Mother`s / Husband`s Name"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+                        <Text style={[styles.label, { marginTop: 10 }]}>
+                            Select DOB.<Text style={styles.badge}>*</Text>
+                        </Text>
+                        <TouchableOpacity style={styles.dateOfBirthPikerView} onPress={showDatePicker} >
+                            <Text style={styles.textDateTimePiker}>{selectedDate}</Text>
+                        </TouchableOpacity>
+                        <Text style={[styles.label, { marginTop: 10 }]}>
+                            Select Gender.<Text style={styles.badge}>*</Text>
+
+                        </Text>
+
+
+                        <View >
+
+                            {/* <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
+                                <View style={styles.groupDataGender}>
+
+                                    <RadioButton value="first" color='#690405' />
+                                    <Text style={styles.labelRedio}>Male</Text>
+
+                                    <RadioButton value="second" color='#690405' />
+                                    <Text style={styles.labelRedio}>Female</Text>
+
+                                    <RadioButton value="third" color='#690405' />
+                                    <Text style={styles.labelRedio}>Others</Text>
+                                </View>
+                            </RadioButton.Group> */}
+
+                            <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
+                                <View style={styles.groupData}>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <RadioButton value="first" color='#690405' />
+                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>Male</Text>
+
+                                    </View>
+
+
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <RadioButton value="second" color='#690405' />
+                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>Female</Text>
+
+                                    </View>
+
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <RadioButton value="third" color='#690405' />
+                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>Others</Text>
+
+                                    </View>
+
+                                    {/*                                   
+                                    <RadioButton value="second" color='#690405' />
+                                    <Text style={styles.labelRedio}>B.SC</Text> */}
+
+                                    {/* <RadioButton value="third" color='#690405' />
+                                    <Text style={styles.labelRedio}>B.Com.</Text> */}
+                                </View>
+                            </RadioButton.Group>
+
+
+                        </View>
+
+
+
+
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Religion"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Religion"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Nationality"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Nationality"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+
+                        <CategorySelectList
+                            label="Select Cast Category"
+                            data={CastData}
+                            selectedValue={selected}
+                            onSelect={(val) => setSelected(val)} // Handle selection update
+                            search={false}
+                            required={true}
+                        />
+
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Email ID"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Email Id"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Contact No."
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Contact No."
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Aadhar Number"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Aadhar Number"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Father`s Aadhar Number"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Father`s Aadhar Number"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Mother`s Aadhar Number"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Mother`s Aadhar Number"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Permanent Address:At"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+                                // maxLength={4}
+                                placeholder="Enter Correspondence Address:At"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Post Office"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Post Office"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Police Office"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Police Office"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+
+
+
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Pin Code"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Pin Code"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+
+                        <CategorySelectList
+                            label="Select State"
+                            data={BloodGroupData}
+                            selectedValue={selected}
+                            onSelect={(val) => setSelected(val)} // Handle selection update
+                            search={true}
+                            required={true}
+                        />
+
+
+                        <CategorySelectList
+                            label="Select District"
+                            data={BloodGroupData}
+                            selectedValue={selected}
+                            onSelect={(val) => setSelected(val)} // Handle selection update
+                            search={true}
+                            required={true}
+                        />
+
+                        <CategorySelectList
+                            label="Select District"
+                            data={BloodGroupData}
+                            selectedValue={selected}
+                            onSelect={(val) => setSelected(val)} // Handle selection update
+                            search={true}
+                            required={true}
+                        />
+
+                        <Text style={[styles.label, { marginTop: 10 }]}>
+                            Subject Details:.<Text style={styles.badge}>*</Text>
+
+                        </Text>
+
+
+
+                        <CategorySelectList
+                            label="Select MJC (Major) Course"
+                            data={BloodGroupData}
+                            selectedValue={selected}
+                            onSelect={(val) => setSelected(val)} // Handle selection update
+                            search={true}
+                            required={true}
+                        />
+                        <CategorySelectList
+                            label="Select MIC (Minor) Course"
+                            data={BloodGroupData}
+                            selectedValue={selected}
+                            onSelect={(val) => setSelected(val)} // Handle selection update
+                            search={true}
+                            required={true}
+                        />
+
+                        <CategorySelectList
+                            label="Select MDC (Multi Disciplinary) Course"
+                            data={BloodGroupData}
+                            selectedValue={selected}
+                            onSelect={(val) => setSelected(val)} // Handle selection update
+                            search={true}
+                            required={true}
+                        />
+                        <CategorySelectList
+                            label="Select AEC (MIL) Language"
+                            data={BloodGroupData}
+                            selectedValue={selected}
+                            onSelect={(val) => setSelected(val)} // Handle selection update
+                            search={true}
+                            required={true}
+                        />
+                        <CategorySelectList
+                            label="Select SEC (Skill Enhancement) Course"
+                            data={BloodGroupData}
+                            selectedValue={selected}
+                            onSelect={(val) => setSelected(val)} // Handle selection update
+                            search={true}
+                            required={true}
+                        />
+                        <CategorySelectList
+                            label="Select VAC (Value Added) Course"
+                            data={BloodGroupData}
+                            selectedValue={selected}
+                            onSelect={(val) => setSelected(val)} // Handle selection update
+                            search={true}
+                            required={true}
+                        />
+                    </View>
+                    <View>
+                        <CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={'Submit & Next'} onClick={() => router.push("/screens/DCRegistration/Edit")} />
+                    </View>
+
+                </View>
+
+
+
+                <DateTimePickerModal
+                    isVisible={isDatePickerVisible}
+                    mode="date"
+                    onConfirm={handleConfirm}
+                    onCancel={hideDatePicker}
+                />
+            </View>
+
+        </ScrollView>
+    )
+}
+
+export default AddRegistration
