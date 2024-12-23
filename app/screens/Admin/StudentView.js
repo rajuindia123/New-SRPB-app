@@ -16,15 +16,16 @@ import CustomButton from "../../components/CustomButton";
 import { router } from "expo-router";
 import { getDocuments } from "../../Function/AppwriteCollection";
 import Loader from "../../components/Loader";
+import { useIsFocused } from '@react-navigation/native';
 
 const CustomTable = () => {
+  const isFocused = useIsFocused();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedCollege, setSelectedCollege] = useState("All");
   const [allStudents, setAllStudents] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const rowsPerPage = 10;
   const tableHeaders = [
     "UAN",
@@ -44,7 +45,7 @@ const CustomTable = () => {
   // console.log(allStudents);
 
   // Check if allStudents has valid data and map it correctly
-  const tableData = allStudents.length > 0 ? allStudents.map(student => [
+  const tableData = allStudents.length > 0 ? allStudents.sort((a, b) => new Date(b.$createdAt) - new Date(a.$createdAt)).map(student => [
     student.stuUAN || "",
     student.stuRankNo || "",
     student.stuName || "",
@@ -127,7 +128,7 @@ const CustomTable = () => {
       }
     };
     handelAllGetStudent();
-  }, []);
+  }, [isFocused]);
   // console.log("tableData",allStudents)
   return loading ? (
     <Loader />
@@ -167,6 +168,7 @@ const CustomTable = () => {
           </View>
 
           <View style={styles.filterContainer}>
+            <View style={styles.filterContainerFirstView}>
             <CategorySelectList
               label="Filter Category Name"
               data={categories}
@@ -176,6 +178,8 @@ const CustomTable = () => {
               required={false}
               defaultOption={defaultData}
             />
+            </View>
+            <View style={{width:'50%',marginTop:20}}>
             <CategorySelectList
               label="Select College Name"
               data={colleges}
@@ -185,6 +189,9 @@ const CustomTable = () => {
               required={false}
               defaultOption={defaultData}
             />
+            </View>
+         
+        
           </View>
 
           <ScrollView horizontal>
@@ -213,7 +220,14 @@ const CustomTable = () => {
                   ))}
                   <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={() => handleViewDetails(row[0])}
+                    onPress={()=>
+                      router.push({
+                        pathname: '/screens/Admin/StudentDetails',
+                        params: { uan: row[0] }, // Pass JSON data as a string
+                      })
+                    }
+                    // onPress={()=>router.push(`/screens/Admin/StudentDetails`)}
+                    // onPress={() => handleViewDetails(row[0])}
                   >
                     <Text style={styles.actionButtonText}>View</Text>
                   </TouchableOpacity>

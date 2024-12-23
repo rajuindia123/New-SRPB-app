@@ -84,9 +84,9 @@ export const getDocuments = async (collectionId) => {
   export const deleteDocument = async (collectionId, documentId) => {
     try {
       await databases.deleteDocument(databaseId, collectionId, documentId);
-      console.log('Document Deleted');
+      return "Document Deleted"
     } catch (error) {
-      console.error('Error Deleting Document:', error);
+      throw new Error('Invalid credentials');
     }
   };
 
@@ -125,3 +125,17 @@ export const getDocuments = async (collectionId) => {
       }
   };
   
+  export const getDocumentsById = async (collectionId,fieldName,fieldData) => {
+    try {
+      const response = await databases.listDocuments(databaseId, collectionId, [
+        Query.equal(fieldName, fieldData) // Match by userId
+      ]);
+  
+      // console.log('Documents:', response.documents);
+      return response.documents;
+    } catch (error) {
+        console.error('Error Fetching Documents:', error);
+        return error
+     
+    }
+  };

@@ -101,9 +101,13 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         justifyContent:'space-between'
       },
+      filterContainerFirstView:{
+        width:'40%'
+
+      },
       filterLabel: {
         // textAlign:'center',
-        fontSize: 16,
+        fontSize: 12,
         fontFamily:FontFamiles.PTSerifBold,
         
         // marginRight: 10,

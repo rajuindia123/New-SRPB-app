@@ -31,6 +31,10 @@ export default function DCDagaruaHomeLayout() {
        
       <Stack.Screen name="AddFinalExam" options={{headerShown:true,headerTitleAlign:'center',headerBackVisible:true,headerTitle:"Add Registration"}} />
 
+      <Stack.Screen name="StudentDetails" options={{headerShown:true,headerTitleAlign:'center',headerBackVisible:true,headerTitle:"Student Details"}} />
+
+      <Stack.Screen name="UpdateStudent" options={{headerShown:true,headerTitleAlign:'center',headerBackVisible:true,headerTitle:"Student Update"}} />
+
 
     </Stack>
   );
