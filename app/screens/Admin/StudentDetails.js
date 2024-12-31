@@ -9,7 +9,6 @@ import Loader from '../../components/Loader';
 
 const StudentDetails = () => {
     const isFocused = useIsFocused();
-
     const { uan } = useLocalSearchParams();
     // console.log(uan)
     const [isModalVisible, setModalVisible] = useState(false);
@@ -94,7 +93,17 @@ const StudentDetails = () => {
 
                 <View style={styles.container}>
                     <View style={styles.topButtonSection}>
-                        <TouchableOpacity style={styles.firstButton} onPress={() => console.log("Update")}>
+                        <TouchableOpacity style={styles.firstButton}
+
+
+                            onPress={() =>
+                                router.push({
+                                    pathname: '/screens/Admin/UpdateStudent',
+                                    params: { uan: uan }, // Pass JSON data as a string
+                                })
+                            }
+
+                        >
                             <Text style={styles.textStyles}>Update</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.topdeleteButon} onPress={showModal}>
@@ -115,7 +124,7 @@ const StudentDetails = () => {
                         ))}
 
                     </View>
-                   
+
 
                 </View>
                 <Modal

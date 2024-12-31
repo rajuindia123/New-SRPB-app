@@ -12,10 +12,40 @@ const styles = StyleSheet.create({
     },
     buttomContainer:{
         position:'absolute',
-        bottom:10,
-        backgroundColor:'red',
-        height:200
-    }
+        bottom:0,
+        backgroundColor:'#D6CFB4',
+         height:70,
+        // left:10,
+        width:'100%',
+        paddingLeft:20,
+        paddingRight:20,
+        paddingTop:10
+        // padding:20,
+    },
+    buttonStyle: {
+        // marginTop:15,
+        alignItems: "center",
+        backgroundColor: "#000",
+        justifyContent: "center",
+        height: 50,
+        borderColor: Colors.primary,
+        borderRadius: 5,
+        // marginBottom:20,
+        // marginRight: 10,
+        // marginTop: 20
+        // margin:30
+    },
+    buttonStyleText: {
+        fontSize: 16,
+        fontFamily: FontFamiles.PTSerifBold,
+        // fontWeight:'600',
+        // // textTransform: 'uppercase',
+        color: Colors.White,
+        textAlign:'center'
+        // textShadowColor: 'rgba(0, 0, 0, 0.25)',
+        // textShadowOffset: { width: 0, height: 4 },
+        // textShadowRadius: 4,
+    },
 });
 
 

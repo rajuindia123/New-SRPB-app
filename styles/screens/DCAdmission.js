@@ -126,13 +126,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: "#fff",
         // elevation: 10,
-        height: 40,
+        // height: 40,
         marginTop: 5
     },
     textDateTimePiker: {
-        textAlign: 'center',
+        textAlign: 'left',
         fontFamily: FontFamiles.PTSerifRegular,
-        fontSize: 18,
+        fontSize: 14,
+        paddingLeft:10
     },
     labelTo: {
         height: 40,
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
     labelRedio: {
         fontSize: 15,
         fontFamily: FontFamiles.PTSerifRegular,
-        // marginTop: 10,
+         marginTop: 6,
         color: Colors.primary
     },
     groupData: {
@@ -278,7 +279,30 @@ const styles = StyleSheet.create({
         borderRadius:10,
     },
 
- 
+    textarea: {
+        height: 100,
+        width: "100%",
+        borderWidth: 1,
+        padding: 10,
+        textAlignVertical: "top", // Ensures the text starts at the top
+        borderColor: Colors.primary,
+        borderRadius: 4,
+        fontSize: 14,
+        fontFamily: FontFamiles.PTSerifRegular,
+        color: "#000",
+      },
+      info:{
+        marginTop:10,
+        fontSize:14,
+        fontFamily:FontFamiles.PTSerifBold,
+        textAlign:'center',
+      },
+      info2:{
+        marginTop:10,
+        fontSize:16,
+        fontFamily:FontFamiles.PTSerifBold,
+        textAlign:'justify',
+      }
 
 
 });

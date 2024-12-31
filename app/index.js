@@ -6,6 +6,9 @@ import Animated, { FadeInLeft } from 'react-native-reanimated';
 import { router } from 'expo-router';
 // import Loader from './components/Loader';
 import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // import AsyncStorage
+import { useIsFocused } from '@react-navigation/native';
+import Loader from './components/Loader';
 
 const images = [
   'https://img.freepik.com/free-vector/college-campus-concept-illustration_114360-10538.jpg',
@@ -17,19 +20,40 @@ const images = [
 
 
 export default function HomePage() {
-  // const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
+  const [isLoggedInAdmin, setIsLoggedInAdmin] = useState(false); // Track login status
+      const [loading, setLoading] = useState(false);
+  const [url,setUrl]=useState("/screens/selectAction/")
+const isFocused=useIsFocused()
 
-  // useEffect(() => {
-  //   // Simulate a loading delay (e.g., fetching data)
-  //   const timer = setTimeout(() => {
-  //     setIsLoading(false);
-  //   }, 3000); // 3 seconds
-  //   return () => clearTimeout(timer);
-  // }, []);
+  useEffect(() => {
+      // Check if the user is already logged in when the component mounts
+      const checkLoginStatus = async () => {
+        const userSession = await AsyncStorage.getItem("userLoggedIn");
+        if (userSession) {
+          const parsedSession = JSON.parse(userSession);
+          // console.log(parsedSession)
+          if (parsedSession.role=="student") {
+            setUrl('/screens/DCDagaruaHome/')
+          }else if(parsedSession.role=="admin"){
+            setUrl('/screens/Admin/')
+          
+          }else{
+            setUrl('/screens/selectAction/')
+          }
+      }
+      
+      };
+  
+      checkLoginStatus();
+  }, [isFocused]);
+  
 
   return (
+    
     // isLoading ?<Loader />:
     <ScrollView showsVerticalScrollIndicator={false}>
+      
       <View style={[styles.imageSlider]}>
         <AutoImageSlider images={images} />
       </View>
@@ -49,7 +73,8 @@ export default function HomePage() {
         {[
           {
             title: 'DC Dagarua',
-            onPress: () => router.push('./screens/selectAction/'),
+            // onPress: () => isLoggedIn?router.push('./screens/DCDagaruaHome/'):router.push('./screens/selectAction/'),
+             onPress: ()=>router.push(url),
             imageSource: require('../assets/images/SRPMLogo.jpeg'),
           },
           {

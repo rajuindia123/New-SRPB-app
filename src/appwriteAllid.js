@@ -1,0 +1,4 @@
+export const DatabasesId="6762defc00355f696a04"
+export const AdmissionCollectionId="676c186100098a6698b8"
+export const AdminLoginCollectionId="6762dfab002ed381a886"
+export const EnrollmentStudentsCollectionId="67644c3d002c8007fd51"

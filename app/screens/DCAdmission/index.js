@@ -1,8 +1,8 @@
-import { View, Text, ScrollView, Image, TouchableOpacity ,BackHandler} from 'react-native'
-import React, { useState ,useEffect} from 'react'
+import { View, Text, ScrollView, Image, TouchableOpacity, BackHandler, TextInput } from 'react-native'
+import React, { useState, useEffect } from 'react'
 import { styles } from '../../../styles/screens/DCAdmission'
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { RadioButton } from 'react-native-paper';
+import { Divider, RadioButton } from 'react-native-paper';
 import CategorySelectList from '../../components/CategorySelectList';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
@@ -30,7 +30,19 @@ const BloodGroupData = [
     { key: '7', value: 'AB+' },
     { key: '8', value: 'AB-' },
 ];
-
+const ReligionData = [
+    { key: '1', value: 'Christianity' },
+    { key: '2', value: 'Judaism' },
+    { key: '3', value: 'Buddhism' },
+    { key: '4', value: 'Shinto' },
+    { key: '5', value: 'Islam' },
+    { key: '6', value: 'Confucianism' },
+    { key: '7', value: 'Jainism' },
+    { key: '8', value: 'Hinduism' },
+    { key: '9', value: 'Taoism' },
+    { key: '10', value: 'Baha`i' },
+    { key: '11', value: 'Zoroastrianism' },
+]
 const ACAdmission = () => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [selectedDate, setSelectedDate] = useState("Select Date Of Birth");
@@ -69,10 +81,10 @@ const ACAdmission = () => {
     //       router.push("/"); // Ensure "/" is the correct route to navigate home
     //       return true; // Prevent the default back action
     //     };
-    
+
     //     // Add event listener for back button press
     //     const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
-    
+
     //     // Cleanup: Remove event listener when the component is unmounted
     //     return () => {
     //       backHandler.remove(); // Use remove() to clean up the event listener
@@ -129,7 +141,7 @@ const ACAdmission = () => {
 
 
 
-          
+
 
 
                 <View style={styles.formContent}>
@@ -149,7 +161,7 @@ const ACAdmission = () => {
                                 badgeStyles={styles.badge}
                             />
                         </View>
-                      
+
 
                     </View>
 
@@ -273,6 +285,63 @@ const ACAdmission = () => {
                             />
 
                         </View>
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Mobile No."
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Mobile No."
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'phone-pad'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="WhatsApp No"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+                                placeholder="Enter WhatsApp No."
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'phone-pad'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Email Id"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+                                placeholder="Enter Email Id"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'email-address'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+                        <CategorySelectList
+                            label="Select Religion"
+                            data={ReligionData}
+                            selectedValue={selected}
+                            onSelect={(val) => setSelected(val)} // Handle selection update
+                            search={false}
+                            required={false}
+                        />
+
+
+
                         <Text style={[styles.label, { marginTop: 10 }]}>
                             Select DOB.<Text style={styles.badge}>*</Text>
                         </Text>
@@ -325,6 +394,56 @@ const ACAdmission = () => {
                             </RadioButton.Group>
                         </View>
 
+
+                        <Text style={[styles.label, { marginTop: 10 }]}>
+                            Select Marital Status.<Text style={styles.badge}>*</Text>
+
+                        </Text>
+
+
+                        <View >
+
+                            <RadioButton.Group onValueChange={newValue => setValue(newValue)} value={value}>
+                                <View style={styles.groupDataGender}>
+
+
+
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <RadioButton value="first" color='#690405' />
+                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>Single</Text>
+
+                                    </View>
+
+
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <RadioButton value="second" color='#690405' />
+                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>Married</Text>
+
+                                    </View>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <RadioButton value="third" color='#690405' />
+                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>Widowed</Text>
+
+                                    </View>
+
+                                </View>
+                                <View style={styles.groupDataGender}>
+
+
+
+
+
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <RadioButton value="third" color='#690405' />
+                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>Divorced</Text>
+
+                                    </View>
+
+                                </View>
+                            </RadioButton.Group>
+                        </View>
+
+
                         <View style={styles.inputView}>
 
                             <CustomInput
@@ -376,6 +495,90 @@ const ACAdmission = () => {
                         <View style={styles.inputView}>
 
                             <CustomInput
+                                title="Mother`s Occupation"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Mother`s Occupation"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Mother`s Mobile No."
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Mother`s Mobile Number"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Father`s Occupation"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Father`s Occupation."
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Father`s Mobile No."
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Father`s Mobile Number"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+
+
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Caste"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Caste"
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
                                 title="Identification Marks"
                                 required={true}
                                 onChangeText={onChangeText}
@@ -390,16 +593,54 @@ const ACAdmission = () => {
                         </View>
 
 
+                        <Text style={[styles.labelsStyle, { marginTop: 10 }]}>
+                            Correspondence Full Address:At.<Text style={styles.badge}>*</Text>
 
+                        </Text>
                         <View style={styles.inputView}>
 
-                            <CustomInput
-                                title="Correspondence Address:At"
-                                required={true}
-                                onChangeText={onChangeText}
-                                value={text}
-
+                            <TextInput
+                                style={styles.textarea}
+                                multiline={true}
+                                numberOfLines={4}
                                 placeholder="Enter Correspondence Address:At"
+                                value={text}
+                                onChangeText={onChangeText}
+                            />
+
+
+                        </View>
+
+
+                        <Text style={[styles.labelsStyle, { marginTop: 10 }]}>
+                            Permanent Full Address:At.<Text style={styles.badge}>*</Text>
+
+                        </Text>
+                        <View style={styles.inputView}>
+
+                            <TextInput
+                                style={styles.textarea}
+                                multiline={true}
+                                numberOfLines={4}
+                                placeholder="Enter Correspondence Address:At"
+                                value={text}
+                                onChangeText={onChangeText}
+                            />
+
+
+                        </View>
+
+
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Bank Name"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Bank Name"
                                 labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
                                 keyboardType={'default'}
                                 badgeStyles={styles.badge}
@@ -410,12 +651,12 @@ const ACAdmission = () => {
                         <View style={styles.inputView}>
 
                             <CustomInput
-                                title="Post Office"
+                                title="A/C Holder"
                                 required={true}
                                 onChangeText={onChangeText}
                                 value={text}
 
-                                placeholder="Enter Post Office"
+                                placeholder="Enter Bank Holder Name"
                                 labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
                                 keyboardType={'default'}
                                 badgeStyles={styles.badge}
@@ -426,38 +667,51 @@ const ACAdmission = () => {
                         <View style={styles.inputView}>
 
                             <CustomInput
-                                title="Police Office"
+                                title="Account No."
                                 required={true}
                                 onChangeText={onChangeText}
                                 value={text}
 
-                                placeholder="Enter Police Office"
+                                placeholder="Enter Account No."
                                 labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
                                 keyboardType={'default'}
                                 badgeStyles={styles.badge}
                             />
 
                         </View>
-
-
-
-
 
                         <View style={styles.inputView}>
 
                             <CustomInput
-                                title="Pin Code"
+                                title="IFSC No"
                                 required={true}
                                 onChangeText={onChangeText}
                                 value={text}
 
-                                placeholder="Enter Pin Code"
+                                placeholder="Enter IFSC No"
                                 labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
                                 keyboardType={'default'}
                                 badgeStyles={styles.badge}
                             />
 
                         </View>
+
+                        <View style={styles.inputView}>
+
+                            <CustomInput
+                                title="Branch Name"
+                                required={true}
+                                onChangeText={onChangeText}
+                                value={text}
+
+                                placeholder="Enter Branch Name."
+                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                keyboardType={'default'}
+                                badgeStyles={styles.badge}
+                            />
+
+                        </View>
+
 
 
                         <CategorySelectList
@@ -480,6 +734,347 @@ const ACAdmission = () => {
                         />
 
                     </View>
+
+
+                    <Divider style={{ marginTop: 10 }} />
+
+                    <Text style={styles.info}>Details Of Educational Qualification </Text>
+
+                    <Divider style={{ marginTop: 10 }} />
+                    <Text style={styles.info2}>Matric/10th Details</Text>
+
+                    <View style={styles.inputView}>
+
+                        <CustomInput
+                            title="Board Name"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter Board Name."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+                    <View style={styles.inputView}>
+
+                        <CustomInput
+                            title="Passing Year"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter Passing Year."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+                    <View style={styles.inputView}>
+
+                        <CustomInput
+                            title="Roll No"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter Roll No."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+                    <View style={styles.inputView}>
+
+                        <CustomInput
+                            title="Roll Code"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter Roll Code."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+                    <View style={styles.inputView}>
+
+                        <CustomInput
+                            title="Marks"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter Marks."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+                    <View style={styles.inputView}>
+
+                        <CustomInput
+                            title="%AGE"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter %AGE."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+                    <CategorySelectList
+                        label="Select Institution State"
+                        data={BloodGroupData}
+                        selectedValue={selected}
+                        onSelect={(val) => setSelected(val)} // Handle selection update
+                        search={true}
+                        required={true}
+                    />
+
+
+                    <CategorySelectList
+                        label="Select Institution District"
+                        data={BloodGroupData}
+                        selectedValue={selected}
+                        onSelect={(val) => setSelected(val)} // Handle selection update
+                        search={true}
+                        required={true}
+                    />
+                    <View style={styles.inputView}>
+                        <CustomInput
+                            title="Institution Code"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter Institution Code."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+
+                    <Divider style={{ marginTop: 10 }} />
+                    <Text style={styles.info2}>Inter/12th Details</Text>
+                    <View style={styles.inputView}>
+
+                        <CustomInput
+                            title="Board Name"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter Board Name."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+                    <View style={styles.inputView}>
+
+                        <CustomInput
+                            title="Passing Year"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter Passing Year."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+                    <View style={styles.inputView}>
+
+                        <CustomInput
+                            title="Roll No"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter Roll No."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+                    <View style={styles.inputView}>
+
+                        <CustomInput
+                            title="Roll Code"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter Roll Code."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+                    <View style={styles.inputView}>
+
+                        <CustomInput
+                            title="Marks"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter Marks."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+                    <View style={styles.inputView}>
+
+                        <CustomInput
+                            title="%AGE"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter %AGE."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+                    <CategorySelectList
+                        label="Select Institution State"
+                        data={BloodGroupData}
+                        selectedValue={selected}
+                        onSelect={(val) => setSelected(val)} // Handle selection update
+                        search={true}
+                        required={true}
+                    />
+
+
+                    <CategorySelectList
+                        label="Select Institution District"
+                        data={BloodGroupData}
+                        selectedValue={selected}
+                        onSelect={(val) => setSelected(val)} // Handle selection update
+                        search={true}
+                        required={true}
+                    />
+                    <View style={styles.inputView}>
+                        <CustomInput
+                            title="Institution Code"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter Institution Code."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+
+                    <View style={styles.inputView}>
+                        <CustomInput
+                            title="C.L.C No."
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter C.L.C No."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+                    <View style={styles.inputView}>
+                        <CustomInput
+                            title="T.C No."
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter C.L.C No."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+                    <View style={styles.inputView}>
+                        <CustomInput
+                            title="C.L.C & T.C Issue Date"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter C.L.C & T.C Issue Date"
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+                    <View style={styles.inputView}>
+                        <CustomInput
+                            title="Migration No."
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+
+                            placeholder="Enter C.L.C & T.C Issue Date"
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+                    <View style={styles.inputView}>
+                        <CustomInput
+                            title="Migration Issue Date"
+                            required={true}
+                            onChangeText={onChangeText}
+                            value={text}
+                            placeholder="Enter Migration Issue Date."
+                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                            keyboardType={'default'}
+                            badgeStyles={styles.badge}
+                        />
+
+                    </View>
+
+
                     <View>
                         <CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={'Submit & Next'} onClick={() => router.push("/screens/DCAdmission/Edit")} />
                     </View>

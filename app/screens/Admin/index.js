@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
-import React from 'react'
+import { View, Text, TouchableOpacity, ScrollView,BackHandler } from 'react-native'
+import React ,{useEffect} from 'react'
 import { styles } from '../../../styles/screens/adminHomePage'
 import { MaterialIcons, MaterialCommunityIcons, Octicons, FontAwesome5, Foundation, Entypo } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -9,10 +9,10 @@ const AdminHomePage = () => {
     // Logout function
     const handleLogout = async () => {
         await AsyncStorage.removeItem("userLoggedIn"); // Clear session data
-        // setIsLoggedIn(false); // Update the login state
         router.replace("/"); // Redirect to login screen
     };
 
+    
     return (
         <>
             <View style={styles.headerContainer}>

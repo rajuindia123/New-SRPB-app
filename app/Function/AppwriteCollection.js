@@ -1,7 +1,7 @@
 import { databases } from "../../src/AppwriteConfig";
 import { Query } from "appwrite";
-
-const databaseId="6762defc00355f696a04"
+import { DatabasesId } from "../../src/appwriteAllid";
+const databaseId=DatabasesId
 
 export const addDocument = async (collectionId, data) => {
   try {
@@ -73,7 +73,7 @@ export const getDocuments = async (collectionId) => {
     try {
       const response = await databases.updateDocument(databaseId, collectionId, documentId, data);
       console.log('Document Updated:', response);
-      return response;
+      return "Document Updated";
     } catch (error) {
         console.error('Error Updating Document:', error);
         return error
@@ -91,6 +91,8 @@ export const getDocuments = async (collectionId) => {
   };
 
 
+
+
   export const loginAdmin = async (collectionId, userId, password) => {
     try {
         // Fetch the user document from the collection based on the userId
@@ -100,7 +102,7 @@ export const getDocuments = async (collectionId) => {
     
         // Check if no user was found with the provided userId
         if (response.documents.length === 0) {
-          throw new Error('User not found');
+          return "User not found"
         }
     
         const user = response.documents[0];
@@ -110,21 +112,64 @@ export const getDocuments = async (collectionId) => {
           // console.log('Login Successful:', user);
           return "Login Successful"; // Return user data if login is successful
         } else {
-          throw new Error('Invalid credentials'); // Invalid password
+          return "Invalid credentials"// Invalid password
         }
       } catch (error) {
         // Handle different types of errors
         if (error.message === 'User not found') {
-          console.error('Error: User not found');
+          return "User not found"
         } else if (error.message === 'Invalid credentials') {
-          console.error('Error: Invalid credentials 123');
+          return "Invalid credentials"
         } else {
-          console.error('Error Logging In:', error.message);
+           return " Logging In Error"
         }
         throw error; // Re-throw the error for further handling
       }
   };
   
+
+  export const loginStudent = async (collectionId, stuUAN, password) => {
+    try {
+        // Fetch the user document from the collection based on the userId
+        const response = await databases.listDocuments(databaseId, collectionId, [
+          Query.equal('stuUAN', stuUAN) // Match by userId
+        ]);
+    
+        // Check if no user was found with the provided userId
+        if (response.documents.length === 0) {
+          return "User not found"
+          // throw new Error('User not found');
+        }
+    
+        const user = response.documents[0];
+        // console.log("user",user)
+        // Here you should compare hashed passwords (e.g., bcrypt) in a real app
+        if (user.stuPassword === password) {
+          // console.log('Login Successful:', user);
+          return "Login Successful"; // Return user data if login is successful
+        } else {
+          return "Invalid credentials"
+          // throw new Error('Invalid credentials'); // Invalid password
+        }
+      } catch (error) {
+        // Handle different types of errors
+        if (error.message === 'User not found') {
+          return "User not found"
+          // console.error('Error: User not found');
+        } else if (error.message === 'Invalid credentials') {
+          return "Invalid credentials"
+          // console.error('Error: Invalid credentials');
+        } else {
+          return " Logging In Error"
+          // console.error('Error Logging In:', error.message);
+        }
+        // Re-throw the error for further handling
+      }
+  };
+  
+
+
+
   export const getDocumentsById = async (collectionId,fieldName,fieldData) => {
     try {
       const response = await databases.listDocuments(databaseId, collectionId, [
@@ -139,3 +184,36 @@ export const getDocuments = async (collectionId) => {
      
     }
   };
+
+
+  export const getDocumentsAllDataTwo = async (collectionId1, collectionId2) => {
+    try {
+      // Fetch documents from both collections
+      const response1 = await databases.listDocuments(databaseId, collectionId1);
+      const response2 = await databases.listDocuments(databaseId, collectionId2);
+  
+      const data1 = response1.documents || [];
+      const data2 = response2.documents || [];
+  
+      // Create a map for the first dataset keyed by stuUAN
+      const data1Map = data1.reduce((map, item) => {
+        map[item.stuUAN] = item; // Use stuUAN as the key
+        return map;
+      }, {});
+  
+      // Filter and merge only matching items
+      const mergedResponse = data2
+        .filter(item => data1Map[item.stuUAN]) // Include only items with matching stuUAN
+        .map(item => {
+          // Merge matching objects
+          return { ...data1Map[item.stuUAN], ...item };
+        });
+  
+      return mergedResponse;
+    } catch (error) {
+      console.error('Error Fetching Documents:', error);
+      return error;
+    }
+  };
+  
+

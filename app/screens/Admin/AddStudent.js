@@ -18,7 +18,6 @@ const EnrollmentStuSchema = Yup.object().shape({
     stuFatherName: Yup.string().required('Please Enter Student Father`s Name'),
     stuMotherName: Yup.string().required('Please Enter Student Mother`s Name'),
     stuGender: Yup.string().required('Please Select Gender'),
-
     stuCategory: Yup.string().required('Please Select Category'),
     stuPassword: Yup.string().required('Please Enter Password'),
     stuSession: Yup.string().required("Please select a session."),

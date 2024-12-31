@@ -22,6 +22,8 @@ import { styles } from "../../styles/screens/login";
 import { addDocument, loginAdmin } from "../Function/AppwriteCollection";
 import AsyncStorage from '@react-native-async-storage/async-storage'; // import AsyncStorage
 import Loader from "../components/Loader";
+import { AdminLoginCollectionId } from "../../src/appwriteAllid";
+import ToastMessage from "../components/ToastMessage";
 
 const LoginSchema = Yup.object().shape({
     password: Yup.string().required("Password is required"),
@@ -33,27 +35,32 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const scrollViewRef = useRef(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
-    useEffect(() => {
-        // Check if the user is already logged in when the component mounts
+    const [toastConfig, setToastConfig] = useState({
+        visible: false,
+        message: "",
+        type: "success", // default type (success, error, warning)
+      });
+      useEffect(() => {
         const checkLoginStatus = async () => {
             const userSession = await AsyncStorage.getItem("userLoggedIn");
-            if (userSession === "true") {
-                setIsLoggedIn(true); // User is logged in, skip login form
-                router.replace("/screens/Admin/"); // Redirect to admin page
+            if (userSession) {
+                const parsedSession = JSON.parse(userSession);
+                console.log(parsedSession)
+                if (parsedSession.role=="admin") {
+                    setIsLoggedIn(true);
+                    router.replace("/screens/Admin/");
+                }
             }
         };
         checkLoginStatus();
     }, []);
+
+
     if (isLoggedIn) {
         return null; // If already logged in, don't show the login form
     }
 
-    // const handleLogin = async () => {
-    //              const data = {
-    //          "userId": "Admin",
-    //          "password": "Admin@123"
-    //      }
-    // }
+  
     return (
         <KeyboardAvoidingView
             style={{ flex: 1, backgroundColor: "690405" }}
@@ -96,17 +103,40 @@ const Login = () => {
                                 };
 
                                 const user = await loginAdmin(
-                                    "6762dfab002ed381a886",
+                                    AdminLoginCollectionId,
                                     trimmedValues.userId,
                                     trimmedValues.password
                                 );
-                                // Store session information in AsyncStorage
-                                await AsyncStorage.setItem("userLoggedIn", "true");
-                                setIsLoggedIn(true); // Set login status to true
-                                router.replace("/screens/Admin/"); // Navigate to Admin screen
-                                // router.push("/screens/Admin/")
-                                // console.log("Login Success:", user);
-                                // Add navigation or success handling here
+
+
+
+                                if(user=="Login Successful"){
+                                    // setIsLoggedIn(true);
+                                    const userLoggedIn = JSON.stringify({
+                                        loggedIn: true,
+                                        role: 'admin',
+                                    });
+    
+                                    await AsyncStorage.setItem("userLoggedIn", userLoggedIn);
+                                    setToastConfig({
+                                        visible: true,
+                                        message: "Login Successful!",
+                                        type: "success",
+                                      });
+                                      setTimeout(() => {
+                                        router.replace("/screens/Admin/");
+                                      }, 1000); // Redirect after showing toast
+
+                                    
+                                    // router.replace("/screens/DCDagaruaHome/");
+                                }else{
+                                    setToastConfig({
+                                        visible: true,
+                                        message: user,
+                                        type: "error",
+                                      });
+                                    // console.log("user",user)
+                                }
                             } catch (error) {
                                 console.log("Login Error:", error);
                                 // Show error to user here if necessary
@@ -205,6 +235,13 @@ const Login = () => {
                   
                 </View>
                   )}
+
+<ToastMessage
+      message={toastConfig.message}
+      visible={toastConfig.visible}
+      type={toastConfig.type}
+      onHide={() => setToastConfig({ ...toastConfig, visible: false })}
+    />
             </ScrollView>
         </KeyboardAvoidingView>
     );
