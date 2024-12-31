@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, ScrollView, Image, TouchableOpacity, Alert, TextInput } from 'react-native'
 import React, { useState } from 'react'
 import { styles } from '../../../styles/screens/DCAdmission'
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -13,7 +13,7 @@ import Loader from '../../components/Loader';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { districtData } from '../../../src/data';  // Import from the correct path
-import { AdmissionCollectionId ,EnrollmentStudentsCollectionId} from '../../../src/appwriteAllid';
+import { AdmissionCollectionId, EnrollmentStudentsCollectionId } from '../../../src/appwriteAllid';
 
 const validationSchema = Yup.object().shape({
     uan: Yup.string().required('UAN is required'),
@@ -29,10 +29,9 @@ const validationSchema = Yup.object().shape({
     fatherAadhar: Yup.string().required('Student Father Aadhar No. is required'),
     motherAadhar: Yup.string().required('Mother Father Aadhar No. is required'),
     identiMark: Yup.string().required('Identification Marks is required'),
-    address: Yup.string().required('Address is required'),
-    pOffice: Yup.string().required('Post Office is required'),
-    psOffice: Yup.string().required('Police Office is required'),
-    pinCode: Yup.string().required('Pin Code is required'),
+    corAddress: Yup.string().required('Correspondence Address is required'),
+    perAddress: Yup.string().required('Permanent Address is required'),
+
     state: Yup.string().required('State is required'),
     district: Yup.string().required('District is required'),
     stuCategory: Yup.string().required('Category is required'),
@@ -62,7 +61,26 @@ const BloodGroupData = [
     { key: '8', value: 'AB-' },
 ];
 
+const ReligionData = [
+    { key: '1', value: 'Christianity' },
+    { key: '2', value: 'Judaism' },
+    { key: '3', value: 'Buddhism' },
+    { key: '4', value: 'Shinto' },
+    { key: '5', value: 'Islam' },
+    { key: '6', value: 'Confucianism' },
+    { key: '7', value: 'Jainism' },
+    { key: '8', value: 'Hinduism' },
+    { key: '9', value: 'Taoism' },
+    { key: '10', value: 'Baha`i' },
+    { key: '11', value: 'Zoroastrianism' },
+]
 
+const MaritalStatusData = [
+    { key: '1', value: 'Single' },
+    { key: '2', value: 'Married' },
+    { key: '3', value: 'Widowed' },
+    { key: '4', value: 'Divorced' },
+]
 
 const AddAdmission = () => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -75,6 +93,8 @@ const AddAdmission = () => {
     const [studentData, setStudentData] = useState(null)
     const [section, setSection] = useState("-")
     const [districts, setDistricts] = useState([]);
+    const [institutionDistricts, seInstitutionDistricts] = useState([]);
+    const [interInstitutionDistricts, seInterInstitutionDistricts] = useState([]);
 
     // Handle state change and update districts
     const handleStateChange = (selectedState, setFieldValue) => {
@@ -87,6 +107,36 @@ const AddAdmission = () => {
         }
         setFieldValue('state', selectedState); // Set the selected state in form
     };
+
+
+    const handleInstitutionStateChange = (selectedState, setFieldValue) => {
+        const stateObj = districtData.states.find(state => state.state === selectedState);
+        // console.log("stateObj",stateObj)
+        if (stateObj) {
+            seInstitutionDistricts(stateObj.districts); // Update districts based on selected state
+            setFieldValue('institutionDistrict', ''); // Clear district selection
+        } else {
+            seInstitutionDistricts([]);
+        }
+        setFieldValue('institutionState', selectedState); // Set the selected state in form
+    };
+
+
+
+    const handleInterStateChange = (selectedState, setFieldValue) => {
+        const stateObj = districtData.states.find(state => state.state === selectedState);
+        // console.log("stateObj",stateObj)
+        if (stateObj) {
+            seInterInstitutionDistricts(stateObj.districts); // Update districts based on selected state
+            setFieldValue('interInstitutionDistrict', ''); // Clear district selection
+        } else {
+            seInterInstitutionDistricts([]);
+        }
+        setFieldValue('interInstitutionState', selectedState); // Set the selected state in form
+    };
+
+
+
 
     const parts = section.split("-");
 
@@ -115,6 +165,9 @@ const AddAdmission = () => {
         console.warn("A date has been picked: ", date);
         hideDatePicker();
     };
+
+
+
 
     const handelSearchData = async () => {
         console.log("search", search)
@@ -199,13 +252,50 @@ const AddAdmission = () => {
                                     fatherAadhar: '',
                                     motherAadhar: '',
                                     identiMark: '',
-                                    address: '',
-                                    pOffice: '',
-                                    psOffice: '',
-                                    pinCode: '',
+                                    corAddress: '',
+                                    perAddress: '',
                                     state: '',
                                     district: '',
-                                    stuCategory: studentData?.stuCategory || ''
+                                    stuCategory: studentData?.stuCategory || '',
+
+                                    mobNo: '',
+                                    whatsappNo: '',
+                                    emailId: '',
+                                    religion: '',
+                                    maritalStatus: '',
+                                    fatherMobNo: '',
+                                    fatherOccupation: '',
+                                    motherOccupation: '',
+                                    motherMobNo: '',
+                                    bankName: '',
+                                    acHolderName: '',
+                                    accountNumber: '',
+                                    ifscNo: '',
+                                    branchName: '',
+
+                                    matricBoardName: '',
+                                    matricPassingYear: '',
+                                    matriRollNo: '',
+                                    matricRollCode: '',
+                                    matricMarks: '',
+                                    matricPercentage: '',
+                                    institutionState: '',
+                                    institutionDistrict: '',
+                                    matricInstitutionCode: '',
+                                    interBoardName: '',
+                                    interPassingYear: '',
+                                    interRollNo: '',
+                                    interRollCode: '',
+                                    interMarks: '',
+                                    interPercentage: '',
+                                    interInstitutionCode: '',
+                                    interCLCNo: '',
+                                    interTCNo: '',
+                                    interCLCTCIssueDate: '',
+                                    interMigrationNo: '',
+                                    interMigrationIssueDate: '',
+                                    interInstitutionState: '',
+                                    interInstitutionDistrict: '',
 
                                 }}
                                 validationSchema={validationSchema}
@@ -326,6 +416,92 @@ const AddAdmission = () => {
                                                 <Text style={{ color: 'red', marginTop: 5 }}>{errors.motherName}</Text>
                                             )}
                                         </View>
+
+
+
+                                        <View style={{ marginTop: 10 }}>
+                                            <CustomInput
+                                                title="Student Mobile Number"
+                                                required={true}
+                                                onChangeText={handleChange('mobNo')}
+                                                onBlur={handleBlur('mobNo')}
+                                                values={values.mobNo}
+                                                placeholder="Enter Mobile Number"
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType="phone-pad"
+                                                badgeStyles={styles.badge}
+                                                editable={true}
+                                            />
+                                            {touched.mobNo && errors.mobNo && (
+                                                <Text style={{ color: 'red', marginTop: 5 }}>{errors.mobNo}</Text>
+                                            )}
+                                        </View>
+                                        <View style={{ marginTop: 10 }}>
+                                            <CustomInput
+                                                title="Student Whatsapp Number"
+                                                required={true}
+                                                onChangeText={handleChange('whatsappNo')}
+                                                onBlur={handleBlur('whatsappNo')}
+                                                values={values.whatsappNo}
+                                                placeholder="Enter Whatsapp Mobile Number"
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType="phone-pad"
+                                                badgeStyles={styles.badge}
+                                                editable={true}
+                                            />
+                                            {touched.whatsappNo && errors.whatsappNo && (
+                                                <Text style={{ color: 'red', marginTop: 5 }}>{errors.whatsappNo}</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={{ marginTop: 10 }}>
+                                            <CustomInput
+                                                title="Student Email Id"
+                                                required={true}
+                                                onChangeText={handleChange('emailId')}
+                                                onBlur={handleBlur('emailId')}
+                                                values={values.emailId}
+                                                placeholder="EnterEmail Id"
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType="email-address"
+                                                badgeStyles={styles.badge}
+                                                editable={true}
+                                            />
+                                            {touched.emailId && errors.emailId && (
+                                                <Text style={{ color: 'red', marginTop: 5 }}>{errors.emailId}</Text>
+                                            )}
+                                        </View>
+
+
+                                        <CategorySelectList
+                                            label="Select Religion"
+                                            data={ReligionData}
+                                            selectedValue={values.religion}
+                                            onSelect={(val) => setFieldValue('religion', val)}
+                                            search={false}
+                                            required={true}
+                                        />
+                                        {touched.religion && errors.religion && (
+                                            <Text style={{ color: 'red' }}>{errors.religion}</Text>
+                                        )}
+
+                                        <CategorySelectList
+                                            label="Select Marital Status"
+                                            data={MaritalStatusData}
+                                            selectedValue={values.religion}
+                                            onSelect={(val) => setFieldValue('maritalStatus', val)}
+                                            search={false}
+                                            required={true}
+                                        />
+                                        {touched.maritalStatus && errors.maritalStatus && (
+                                            <Text style={{ color: 'red' }}>{errors.maritalStatus}</Text>
+                                        )}
+
+
+
 
 
 
@@ -517,12 +693,12 @@ const AddAdmission = () => {
 
 
                                                 <CustomInput
-                                                    title="Mothers Aadhar Number"
+                                                    title="Mother`s Aadhar Number"
                                                     required={true}
                                                     onChangeText={handleChange('motherAadhar')}
                                                     onBlur={handleBlur('motherAadhar')}
                                                     values={values.motherAadhar}
-                                                    placeholder="Enter Mothers Aadhar Number"
+                                                    placeholder="Enter Mother`s Aadhar Number"
                                                     labelsStyle={styles.labelsStyle}
                                                     inputStyle={styles.inputStyle}
                                                     keyboardType="default"
@@ -540,12 +716,61 @@ const AddAdmission = () => {
 
 
                                                 <CustomInput
-                                                    title="Father Aadhar Number"
+                                                    title="Mother`s Mobile Number"
+                                                    required={true}
+                                                    onChangeText={handleChange('motherMobNo')}
+                                                    onBlur={handleBlur('motherMobNo')}
+                                                    values={values.motherMobNo}
+                                                    placeholder="Enter Mother`s Mobile Number"
+                                                    labelsStyle={styles.labelsStyle}
+                                                    inputStyle={styles.inputStyle}
+                                                    keyboardType="phone-pad"
+                                                    badgeStyles={styles.badge}
+                                                    editable={true}
+                                                />
+                                                {touched.motherMobNo && errors.motherMobNo && (
+                                                    <Text style={{ color: 'red' }}>{errors.motherMobNo}</Text>
+                                                )}
+
+                                            </View>
+
+
+
+                                            <View style={styles.inputView}>
+
+
+
+                                                <CustomInput
+                                                    title="Mother`s Occupation"
+                                                    required={true}
+                                                    onChangeText={handleChange('motherOccupation')}
+                                                    onBlur={handleBlur('motherOccupation')}
+                                                    values={values.fatherOccupation}
+                                                    placeholder="Enter Mother`s Occupation"
+                                                    labelsStyle={styles.labelsStyle}
+                                                    inputStyle={styles.inputStyle}
+                                                    keyboardType="default"
+                                                    badgeStyles={styles.badge}
+                                                    editable={true}
+                                                />
+                                                {touched.motherOccupation && errors.motherOccupation && (
+                                                    <Text style={{ color: 'red' }}>{errors.motherOccupation}</Text>
+                                                )}
+
+                                            </View>
+
+
+                                            <View style={styles.inputView}>
+
+
+
+                                                <CustomInput
+                                                    title="Father`s Aadhar Number"
                                                     required={true}
                                                     onChangeText={handleChange('fatherAadhar')}
                                                     onBlur={handleBlur('fatherAadhar')}
                                                     values={values.fatherAadhar}
-                                                    placeholder="Enter Father Aadhar Number"
+                                                    placeholder="Enter Father`s Aadhar Number"
                                                     labelsStyle={styles.labelsStyle}
                                                     inputStyle={styles.inputStyle}
                                                     keyboardType="default"
@@ -557,6 +782,57 @@ const AddAdmission = () => {
                                                 )}
 
                                             </View>
+
+                                            <View style={styles.inputView}>
+
+
+
+                                                <CustomInput
+                                                    title="Father`s Mobile Number"
+                                                    required={true}
+                                                    onChangeText={handleChange('fatherMobNo')}
+                                                    onBlur={handleBlur('fatherMobNo')}
+                                                    values={values.fatherMobNo}
+                                                    placeholder="Enter Father`s Mobile Number"
+                                                    labelsStyle={styles.labelsStyle}
+                                                    inputStyle={styles.inputStyle}
+                                                    keyboardType="phone-pad"
+                                                    badgeStyles={styles.badge}
+                                                    editable={true}
+                                                />
+                                                {touched.fatherMobNo && errors.fatherMobNo && (
+                                                    <Text style={{ color: 'red' }}>{errors.fatherMobNo}</Text>
+                                                )}
+
+                                            </View>
+
+
+
+                                            <View style={styles.inputView}>
+
+
+
+                                                <CustomInput
+                                                    title="Father`s Occupation"
+                                                    required={true}
+                                                    onChangeText={handleChange('fatherOccupation ')}
+                                                    onBlur={handleBlur('fatherOccupation')}
+                                                    values={values.fatherOccupation}
+                                                    placeholder="Enter Father`s Occupation"
+                                                    labelsStyle={styles.labelsStyle}
+                                                    inputStyle={styles.inputStyle}
+                                                    keyboardType="default"
+                                                    badgeStyles={styles.badge}
+                                                    editable={true}
+                                                />
+                                                {touched.fatherOccupation && errors.fatherOccupation && (
+                                                    <Text style={{ color: 'red' }}>{errors.fatherOccupation}</Text>
+                                                )}
+
+                                            </View>
+
+
+
 
 
                                             <View style={styles.inputView}>
@@ -584,83 +860,166 @@ const AddAdmission = () => {
 
 
 
+
+
+
+
+
+
+
+                                            <Text style={[styles.labelsStyle, { marginTop: 10 }]}>
+                                                Correspondence Full Address:At.<Text style={styles.badge}>*</Text>
+
+                                            </Text>
+
                                             <View style={styles.inputView}>
 
-
-
-                                                <CustomInput
-                                                    title="Correspondence Address:At"
-                                                    required={true}
-                                                    onChangeText={handleChange('address')}
-                                                    onBlur={handleBlur('address')}
-                                                    values={values.address}
+                                                <TextInput
+                                                    style={styles.textarea}
+                                                    multiline={true}
+                                                    numberOfLines={4}
                                                     placeholder="Enter Correspondence Address:At"
-                                                    labelsStyle={styles.labelsStyle}
-                                                    inputStyle={styles.inputStyle}
-                                                    keyboardType="default"
-                                                    badgeStyles={styles.badge}
-                                                    editable={true}
+                                                    onChangeText={handleChange('corAddress')}
+                                                    onBlur={handleBlur('corAddress')}
+                                                    values={values.corAddress}
                                                 />
-                                                {touched.address && errors.address && (
-                                                    <Text style={{ color: 'red' }}>{errors.address}</Text>
-                                                )}
-
-                                         </View>
-                                            <View style={styles.inputView}>
-                                                <CustomInput
-                                                    title="Post Office"
-                                                    required={true}
-                                                    onChangeText={handleChange('pOffice')}
-                                                    onBlur={handleBlur('pOffice')}
-                                                    values={values.pOffice}
-                                                    placeholder="EnterPost Office"
-                                                    labelsStyle={styles.labelsStyle}
-                                                    inputStyle={styles.inputStyle}
-                                                    keyboardType="default"
-                                                    badgeStyles={styles.badge}
-                                                    editable={true}
-                                                />
-                                                {touched.pOffice && errors.pOffice && (
-                                                    <Text style={{ color: 'red' }}>{errors.pOffice}</Text>
+                                                {touched.corAddress && errors.corAddress && (
+                                                    <Text style={{ color: 'red' }}>{errors.corAddress}</Text>
                                                 )}
 
                                             </View>
+
+
+
+
+                                            <Text style={[styles.labelsStyle, { marginTop: 10 }]}>
+                                                Permanent Full Address:At.<Text style={styles.badge}>*</Text>
+
+                                            </Text>
                                             <View style={styles.inputView}>
-                                                <CustomInput
-                                                    title="Police Station "
-                                                    required={true}
-                                                    onChangeText={handleChange('psOffice')}
-                                                    onBlur={handleBlur('psOffice')}
-                                                    values={values.psOffice}
-                                                    placeholder="Enter Police Station"
-                                                    labelsStyle={styles.labelsStyle}
-                                                    inputStyle={styles.inputStyle}
-                                                    keyboardType="default"
-                                                    badgeStyles={styles.badge}
-                                                    editable={true}
+
+                                                <TextInput
+                                                    style={styles.textarea}
+                                                    multiline={true}
+                                                    numberOfLines={4}
+                                                    placeholder="Enter Correspondence Address:At"
+                                                    onChangeText={handleChange('perAddress')}
+                                                    onBlur={handleBlur('perAddress')}
+                                                    values={values.perAddress}
                                                 />
-                                                {touched.psOffice && errors.psOffice && (
-                                                    <Text style={{ color: 'red' }}>{errors.psOffice}</Text>
+                                                {touched.perAddress && errors.perAddress && (
+                                                    <Text style={{ color: 'red' }}>{errors.perAddress}</Text>
                                                 )}
 
                                             </View>
+
+
+
+
+
+
+
                                             <View style={styles.inputView}>
 
                                                 <CustomInput
-                                                    title="Pin Code"
+                                                    title="Bank Name"
                                                     required={true}
-                                                    onChangeText={handleChange('pinCode')}
-                                                    onBlur={handleBlur('pinCode')}
-                                                    values={values.pinCode}
-                                                    placeholder="Enter Pin Code"
+                                                    onChangeText={handleChange('bankName')}
+                                                    onBlur={handleBlur('bankName')}
+                                                    values={values.bankName}
+                                                    placeholder="Enter Bank Name"
+                                                    labelsStyle={styles.labelsStyle}
+                                                    inputStyle={styles.inputStyle}
+                                                    keyboardType={'default'}
+                                                    badgeStyles={styles.badge}
+                                                />
+                                                {touched.bankName && errors.bankName && (
+                                                    <Text style={{ color: 'red' }}>{errors.bankName}</Text>
+                                                )}
+                                            </View>
+
+                                            <View style={styles.inputView}>
+
+                                                <CustomInput
+                                                    title="A/C Holder"
+                                                    required={true}
+                                                    onChangeText={handleChange('acHolderName')}
+                                                    onBlur={handleBlur('acHolderName')}
+                                                    values={values.acHolderName}
+
+                                                    placeholder="Enter Bank Holder Name"
                                                     labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
                                                     keyboardType={'default'}
                                                     badgeStyles={styles.badge}
                                                 />
-                                                {touched.pinCode && errors.pinCode && (
-                                                    <Text style={{ color: 'red' }}>{errors.pinCode}</Text>
+                                                {touched.acHolderName && errors.acHolderName && (
+                                                    <Text style={{ color: 'red' }}>{errors.acHolderName}</Text>
                                                 )}
                                             </View>
+
+                                            <View style={styles.inputView}>
+
+                                                <CustomInput
+                                                    title="Account No."
+                                                    required={true}
+                                                    onChangeText={handleChange('accountNumber')}
+                                                    onBlur={handleBlur('accountNumber')}
+                                                    values={values.accountNumber}
+                                                    placeholder="Enter Account No."
+                                                    labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                    keyboardType={'default'}
+                                                    badgeStyles={styles.badge}
+                                                />
+                                                {touched.accountNumber && errors.accountNumber && (
+                                                    <Text style={{ color: 'red' }}>{errors.accountNumber}</Text>
+                                                )}
+                                            </View>
+
+                                            <View style={styles.inputView}>
+
+                                                <CustomInput
+                                                    title="IFSC No"
+                                                    required={true}
+                                                    onChangeText={handleChange('ifscNo')}
+                                                    onBlur={handleBlur('ifscNo')}
+                                                    values={values.ifscNo}
+
+                                                    placeholder="Enter IFSC No"
+                                                    labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                    keyboardType={'default'}
+                                                    badgeStyles={styles.badge}
+                                                />
+                                                {touched.ifscNo && errors.ifscNo && (
+                                                    <Text style={{ color: 'red' }}>{errors.ifscNo}</Text>
+                                                )}
+                                            </View>
+
+                                            <View style={styles.inputView}>
+
+                                                <CustomInput
+                                                    title="Branch Name"
+                                                    required={true}
+                                                    onChangeText={handleChange('branchName')}
+                                                    onBlur={handleBlur('branchName')}
+                                                    values={values.branchName}
+                                                    placeholder="Enter Branch Name."
+                                                    labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                    keyboardType={'default'}
+                                                    badgeStyles={styles.badge}
+                                                />
+                                                {touched.branchName && errors.branchName && (
+                                                    <Text style={{ color: 'red' }}>{errors.branchName}</Text>
+                                                )}
+                                            </View>
+
+
+
+
+
+
+
+
+
                                             <CategorySelectList
                                                 label="Select State"
                                                 data={districtData.states.map(state => ({ key: state.state, value: state.state }))}
@@ -685,6 +1044,441 @@ const AddAdmission = () => {
                                             )}
 
                                         </View>
+
+
+
+                                        <Divider style={{ marginTop: 10 }} />
+
+                                        <Text style={styles.info}>Details Of Educational Qualification </Text>
+
+                                        <Divider style={{ marginTop: 10 }} />
+                                        <Text style={styles.info2}>Matric/10th Details</Text>
+
+                                        <View style={styles.inputView}>
+
+                                            <CustomInput
+                                                title="Board Name"
+                                                required={true}
+                                                onChangeText={handleChange('matricBoardName')}
+                                                onBlur={handleBlur('matricBoardName')}
+                                                values={values.matricBoardName}
+
+                                                placeholder="Enter Board Name."
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.matricBoardName && errors.matricBoardName && (
+                                                <Text style={{ color: 'red' }}>{errors.matricBoardName}</Text>
+                                            )}
+                                        </View>
+                                        <View style={styles.inputView}>
+
+                                            <CustomInput
+                                                title="Passing Year"
+                                                required={true}
+                                                onChangeText={handleChange('matricPassingYear')}
+                                                onBlur={handleBlur('matricPassingYear')}
+                                                values={values.matricPassingYear}
+                                                placeholder="Enter Passing Year."
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.matricPassingYear && errors.matricPassingYear && (
+                                                <Text style={{ color: 'red' }}>{errors.matricPassingYear}</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={styles.inputView}>
+
+                                            <CustomInput
+                                                title="Roll No"
+                                                required={true}
+                                                onChangeText={handleChange('matriRollNo')}
+                                                onBlur={handleBlur('matriRollNo')}
+                                                values={values.matriRollNo}
+                                                placeholder="Enter Roll No."
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.matriRollNo && errors.matriRollNo && (
+                                                <Text style={{ color: 'red' }}>{errors.matriRollNo}</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={styles.inputView}>
+
+                                            <CustomInput
+                                                title="Roll Code"
+                                                required={true}
+                                                onChangeText={handleChange('matricRollCode')}
+                                                onBlur={handleBlur('matricRollCode')}
+                                                values={values.matricRollCode}
+
+                                                placeholder="Enter Roll Code."
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.matricRollCode && errors.matricRollCode && (
+                                                <Text style={{ color: 'red' }}>{errors.matricRollCode}</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={styles.inputView}>
+
+                                            <CustomInput
+                                                title="Marks"
+                                                required={true}
+                                                onChangeText={handleChange('matricMarks')}
+                                                onBlur={handleBlur('matricMarks')}
+                                                values={values.matricMarks}
+                                                placeholder="Enter Marks."
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.matricMarks && errors.matricMarks && (
+                                                <Text style={{ color: 'red' }}>{errors.matricMarks}</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={styles.inputView}>
+
+                                            <CustomInput
+                                                title="%AGE"
+                                                required={true}
+                                                onChangeText={handleChange('matricPercentage')}
+                                                onBlur={handleBlur('matricPercentage')}
+                                                values={values.matricPercentage}
+                                                placeholder="Enter %AGE."
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.matricPercentage && errors.matricPercentage && (
+                                                <Text style={{ color: 'red' }}>{errors.matricPercentage}</Text>
+                                            )}
+                                        </View>
+
+
+
+                                        <CategorySelectList
+                                            label="Select Institution State"
+                                            data={districtData.states.map(state => ({ key: state.state, value: state.state }))}
+                                            selectedValue={values.institutionState}
+                                            onSelect={(val) => handleInstitutionStateChange(val, setFieldValue)}
+                                            required={true}
+                                            search={true}
+                                        />
+                                        {touched.institutionState && errors.institutionState && (
+                                            <Text style={{ color: 'red' }}>{errors.institutionState}</Text>
+                                        )}
+
+                                        <CategorySelectList
+                                            label="Select Institution District"
+                                            data={institutionDistricts.map(district => ({ key: district, value: district }))}
+                                            selectedValue={values.institutionDistrict}
+                                            onSelect={(val) => setFieldValue('institutionDistrict', val)} // Handle district selection
+                                            required={true}
+                                            search={true}
+                                        />
+                                        {touched.institutionDistrict && errors.institutionDistrict && (
+                                            <Text style={{ color: 'red' }}>{errors.institutionDistrict}</Text>
+                                        )}
+
+
+
+
+                                        <View style={styles.inputView}>
+                                            <CustomInput
+                                                title="Institution Code"
+                                                required={true}
+                                                onChangeText={handleChange('matricInstitutionCode')}
+                                                onBlur={handleBlur('matricInstitutionCode')}
+                                                values={values.matricInstitutionCode}
+
+                                                placeholder="Enter Institution Code."
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.matricInstitutionCode && errors.matricInstitutionCode && (
+                                                <Text style={{ color: 'red' }}>{errors.matricInstitutionCode}</Text>
+                                            )}
+                                        </View>
+
+
+
+                                        <Divider style={{ marginTop: 10 }} />
+                                        <Text style={styles.info2}>Inter/12th Details</Text>
+                                        <View style={styles.inputView}>
+
+                                            <CustomInput
+                                                title="Board Name"
+                                                required={true}
+                                                onChangeText={handleChange('interBoardName')}
+                                                onBlur={handleBlur('interBoardName')}
+                                                values={values.interBoardName}
+
+                                                placeholder="Enter Board Name."
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.interBoardName && errors.interBoardName && (
+                                                <Text style={{ color: 'red' }}>{errors.interBoardName}</Text>
+                                            )}
+                                        </View>
+                                        <View style={styles.inputView}>
+
+                                            <CustomInput
+                                                title="Passing Year"
+                                                required={true}
+                                                onChangeText={handleChange('interPassingYear')}
+                                                onBlur={handleBlur('interPassingYear')}
+                                                values={values.interPassingYear}
+                                                placeholder="Enter Passing Year."
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.interPassingYear && errors.interPassingYear && (
+                                                <Text style={{ color: 'red' }}>{errors.interPassingYear}</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={styles.inputView}>
+
+                                            <CustomInput
+                                                title="Roll No"
+                                                required={true}
+                                                onChangeText={handleChange('interRollNo')}
+                                                onBlur={handleBlur('interRollNo')}
+                                                values={values.interRollNo}
+                                                placeholder="Enter Roll No."
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.interRollNo && errors.interRollNo && (
+                                                <Text style={{ color: 'red' }}>{errors.interRollNo}</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={styles.inputView}>
+
+                                            <CustomInput
+                                                title="Roll Code"
+                                                required={true}
+                                                onChangeText={handleChange('interRollCode')}
+                                                onBlur={handleBlur('interRollCode')}
+                                                values={values.interRollCode}
+                                                placeholder="Enter Roll Code."
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.interRollCode && errors.interRollCode && (
+                                                <Text style={{ color: 'red' }}>{errors.interRollCode}</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={styles.inputView}>
+
+                                            <CustomInput
+                                                title="Marks"
+                                                required={true}
+                                                onChangeText={handleChange('interMarks')}
+                                                onBlur={handleBlur('interMarks')}
+                                                values={values.interMarks}
+                                                placeholder="Enter Marks."
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.interMarks && errors.interMarks && (
+                                                <Text style={{ color: 'red' }}>{errors.interMarks}</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={styles.inputView}>
+
+                                            <CustomInput
+                                                title="%AGE"
+                                                required={true}
+                                                onChangeText={handleChange('interPercentage')}
+                                                onBlur={handleBlur('interPercentage')}
+                                                values={values.interPercentage}
+                                                placeholder="Enter %AGE."
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.interPercentage && errors.interPercentage && (
+                                                <Text style={{ color: 'red' }}>{errors.interPercentage}</Text>
+                                            )}
+                                        </View>
+
+
+
+
+
+                                        <CategorySelectList
+                                            label="Select Institution State"
+                                            data={districtData.states.map(state => ({ key: state.state, value: state.state }))}
+                                            selectedValue={values.interInstitutionState}
+                                            onSelect={(val) => handleInterStateChange(val, setFieldValue)}
+                                            required={true}
+                                            search={true}
+                                        />
+                                        {touched.interInstitutionState && errors.interInstitutionState && (
+                                            <Text style={{ color: 'red' }}>{errors.interInstitutionState}</Text>
+                                        )}
+
+                                        <CategorySelectList
+                                            label="Select Institution District"
+                                            data={interInstitutionDistricts.map(district => ({ key: district, value: district }))}
+                                            selectedValue={values.interInstitutionDistrict}
+                                            onSelect={(val) => setFieldValue('interInstitutionDistrict', val)} // Handle district selection
+                                            required={true}
+                                            search={true}
+                                        />
+                                        {touched.interInstitutionDistrict && errors.interInstitutionDistrict && (
+                                            <Text style={{ color: 'red' }}>{errors.interInstitutionDistrict}</Text>
+                                        )}
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                        <View style={styles.inputView}>
+                                            <CustomInput
+                                                title="Institution Code"
+                                                required={true}
+                                                onChangeText={handleChange('interInstitutionCode')}
+                                                onBlur={handleBlur('interInstitutionCode')}
+                                                values={values.interInstitutionCode}
+
+                                                placeholder="Enter Institution Code."
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.interInstitutionCode && errors.interInstitutionCode && (
+                                                <Text style={{ color: 'red' }}>{errors.interInstitutionCode}</Text>
+                                            )}
+                                        </View>
+
+
+                                        <View style={styles.inputView}>
+                                            <CustomInput
+                                                title="C.L.C No."
+                                                required={true}
+                                                onChangeText={handleChange('interCLCNo')}
+                                                onBlur={handleBlur('interCLCNo')}
+                                                values={values.interCLCNo}
+                                                placeholder="Enter C.L.C No."
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.interCLCNo && errors.interCLCNo && (
+                                                <Text style={{ color: 'red' }}>{errors.interCLCNo}</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={styles.inputView}>
+                                            <CustomInput
+                                                title="T.C No."
+                                                required={true}
+                                                onChangeText={handleChange('interTCNo')}
+                                                onBlur={handleBlur('interTCNo')}
+                                                values={values.interTCNo}
+                                                placeholder="Enter C.L.C No."
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.interTCNo && errors.interTCNo && (
+                                                <Text style={{ color: 'red' }}>{errors.interTCNo}</Text>
+                                            )}
+                                        </View>
+                                        <View style={styles.inputView}>
+                                            <CustomInput
+                                                title="C.L.C & T.C Issue Date"
+                                                required={true}
+                                                onChangeText={handleChange('interCLCTCIssueDate')}
+                                                onBlur={handleBlur('interCLCTCIssueDate')}
+                                                values={values.interCLCTCIssueDate}
+                                                placeholder="Enter C.L.C & T.C Issue Date"
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.interCLCTCIssueDate && errors.interCLCTCIssueDate && (
+                                                <Text style={{ color: 'red' }}>{errors.interCLCTCIssueDate}</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={styles.inputView}>
+                                            <CustomInput
+                                                title="Migration No."
+                                                required={true}
+                                                onChangeText={handleChange('interMigrationNo')}
+                                                onBlur={handleBlur('interMigrationNo')}
+                                                values={values.interMigrationNo}
+                                                placeholder="Enter C.L.C & T.C Issue Date"
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.interMigrationNo && errors.interMigrationNo && (
+                                                <Text style={{ color: 'red' }}>{errors.interMigrationNo}</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={styles.inputView}>
+                                            <CustomInput
+                                                title="Migration Issue Date"
+                                                required={true}
+                                                onChangeText={handleChange('interMigrationIssueDate')}
+                                                onBlur={handleBlur('interMigrationIssueDate')}
+                                                values={values.interMigrationIssueDate}
+                                                placeholder="Enter Migration Issue Date."
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.interMigrationIssueDate && errors.interMigrationIssueDate && (
+                                                <Text style={{ color: 'red' }}>{errors.interMigrationIssueDate}</Text>
+                                            )}
+                                        </View>
+
+
+
+
+
+
+
+
                                         <View>
                                             <CustomButton
                                                 buttonStyle={styles.buttonStyle}

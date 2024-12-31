@@ -930,3 +930,32 @@ export const districtData={
        }
     ]
  }
+
+
+ 
+export const SubjectOfferedData={  
+   "subjects":[  
+      {  
+         "subject":"Arts",
+         "artsSubject":[  
+            "Geography",
+            "Ancient Indian & Culture",
+            "History",
+            "Political Science",
+            "Economics",
+            "Psychology",
+            "Music",
+            "Hindi",
+            "English",
+            "Urdu",
+            "Sanskrit",
+            "Public Administration",
+            "Sociology",
+            "Home Science",
+            "Philosophy",
+            "Mathematics",
+         ]
+      },
+      
+   ]
+}
