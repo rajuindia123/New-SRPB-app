@@ -12,8 +12,9 @@ import { addDocument, getDocumentsById } from '../../Function/AppwriteCollection
 import Loader from '../../components/Loader';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { districtData } from '../../../src/data';  // Import from the correct path
+import { districtData, SubjectOfferedData } from '../../../src/data';  // Import from the correct path
 import { AdmissionCollectionId, EnrollmentStudentsCollectionId } from '../../../src/appwriteAllid';
+const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/
 
 const validationSchema = Yup.object().shape({
     uan: Yup.string().required('UAN is required'),
@@ -31,10 +32,64 @@ const validationSchema = Yup.object().shape({
     identiMark: Yup.string().required('Identification Marks is required'),
     corAddress: Yup.string().required('Correspondence Address is required'),
     perAddress: Yup.string().required('Permanent Address is required'),
-
     state: Yup.string().required('State is required'),
     district: Yup.string().required('District is required'),
     stuCategory: Yup.string().required('Category is required'),
+
+    mobNo: Yup.string().required('Student Mobile No is required').matches(phoneRegExp, 'Phone number is not valid')
+    .min(10, "too short")
+    .max(10, "too long"),
+    whatsappNo: Yup.string().required('Student WhatsApp No is required').matches(phoneRegExp, 'Phone number is not valid')
+    .min(10, "too short")
+    .max(10, "too long"),
+    emailId: Yup.string().required('Student Email Id is required').email(),
+    religion: Yup.string().required('Student Religion is required'),
+    maritalStatus: Yup.string().required('Student Marital Status is required'),
+    fatherMobNo: Yup.string().required('Father`s Mob No is required').matches(phoneRegExp, 'Phone number is not valid')
+    .min(10, "too short")
+    .max(10, "too long"),
+    fatherOccupation: Yup.string().required('Father`s Occupation is required'),
+    motherOccupation: Yup.string().required('Mother`s Occupation is required'),
+    motherMobNo: Yup.string().required('Mother`s Mob No is required').matches(phoneRegExp, 'Phone number is not valid')
+    .min(10, "too short")
+    .max(10, "too long"),
+    bankName: Yup.string().required('Bank Name is required'),
+    acHolderName: Yup.string().required('Account Holder Name is required'),
+    accountNumber: Yup.string().required('Account No is required'),
+    ifscNo: Yup.string().required('IFSC No is required'),
+    branchName: Yup.string().required('Branch Name is required'),
+
+    matricBoardName: Yup.string().required('Board Name is required'),
+    matricPassingYear: Yup.string().required('Passing Year is required'),
+    matriRollNo: Yup.string().required('Roll Number is required'),
+    matricRollCode: Yup.string().required('Roll Code is required'),
+    matricMarks: Yup.string().required('Marks is required'),
+    matricPercentage: Yup.string().required('Percentage is required'),
+    institutionState: Yup.string().required('Institution State is required'),
+    institutionDistrict: Yup.string().required('Institution District is required'),
+    matricInstitutionCode: Yup.string().required('Institution Code is required'),
+    interBoardName: Yup.string().required('Board Name is required'),
+    interPassingYear: Yup.string().required('Passing Year is required'),
+    interRollNo: Yup.string().required('Roll No is required'),
+    interRollCode: Yup.string().required('Roll Name is required'),
+    interMarks: Yup.string().required('Marks is required'),
+    interPercentage: Yup.string().required('Percentage is required'),
+    interInstitutionCode: Yup.string().required('Institution Code is required'),
+    interCLCNo: Yup.string().required('CLC No is required'),
+    interTCNo: Yup.string().required('TC No is required'),
+    interCLCTCIssueDate: Yup.string().required('Issue Date is required'),
+    interMigrationNo: Yup.string().required('Migration No is required'),
+    interMigrationIssueDate: Yup.string().required('Issue Date is required'),
+    interInstitutionState: Yup.string().required('Institution State is required'),
+    interInstitutionDistrict: Yup.string().required('Institution District is required'),
+    micSubject: Yup.string().required('MIC Subject is required'),
+    mdcSubject: Yup.string().required('MDC Subject is required'),
+    secSubject: Yup.string().required('SEC Subject is required'),
+    vacSubject: Yup.string().required('VAC Subject is required'),
+    extraSubject: Yup.string().required('This Felid is required'),
+    admissionFee: Yup.string().required('Admission Fee is required'),
+
+
 });
 
 
@@ -82,6 +137,19 @@ const MaritalStatusData = [
     { key: '4', value: 'Divorced' },
 ]
 
+const StreamData = [
+    { key: '1', value: 'Commerce' },
+    { key: '2', value: 'Science' },
+    { key: '3', value: 'Arts' },
+]
+
+const extraSubjectData1 = [
+    { key: '1', value: 'Hindi' },
+    { key: '2', value: 'English' },
+    { key: '3', value: 'Urdu' },
+    { key: '4', value: 'Mathali' },
+]
+
 const AddAdmission = () => {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [selectedDate, setSelectedDate] = useState("Select Date Of Birth");
@@ -95,6 +163,8 @@ const AddAdmission = () => {
     const [districts, setDistricts] = useState([]);
     const [institutionDistricts, seInstitutionDistricts] = useState([]);
     const [interInstitutionDistricts, seInterInstitutionDistricts] = useState([]);
+    const [subject, setSubject] = useState([]);
+    const [mdcSubject, setMdcSubject] = useState([]);
 
     // Handle state change and update districts
     const handleStateChange = (selectedState, setFieldValue) => {
@@ -133,6 +203,27 @@ const AddAdmission = () => {
             seInterInstitutionDistricts([]);
         }
         setFieldValue('interInstitutionState', selectedState); // Set the selected state in form
+    };
+
+    const handleMJCChange = (selectedSubject, setFieldValue) => {
+        const subjectObj = SubjectOfferedData.subjects.find(subject => subject.subject === selectedSubject);
+        const subjectObjNot = SubjectOfferedData.subjects.filter(data => data.subject !== selectedSubject)
+
+        const allSubjects = subjectObjNot
+            .flatMap(item => item.subSubject) // Combine all subSubject arrays
+            .filter((value, index, self) => self.indexOf(value) === index); // Remove duplicates
+
+        // console.log(allSubjects)
+        // console.log("subjectObj",subjectObj)
+        // console.log("stateObj",stateObj)
+        if (subjectObj) {
+            setSubject(subjectObj.subSubject); // Update districts based on selected state
+            setFieldValue('majorPaper', ''); // Clear district selection
+            setMdcSubject(allSubjects)
+        } else {
+            setSubject([]);
+        }
+        setFieldValue('stream', selectedSubject); // Set the selected state in form
     };
 
 
@@ -257,7 +348,6 @@ const AddAdmission = () => {
                                     state: '',
                                     district: '',
                                     stuCategory: studentData?.stuCategory || '',
-
                                     mobNo: '',
                                     whatsappNo: '',
                                     emailId: '',
@@ -296,6 +386,12 @@ const AddAdmission = () => {
                                     interMigrationIssueDate: '',
                                     interInstitutionState: '',
                                     interInstitutionDistrict: '',
+                                    micSubject: '',
+                                    mdcSubject: '',
+                                    secSubject: studentData?.stuSEC || '',
+                                    vacSubject: studentData?.stuVAC || '',
+                                    extraSubject: '',
+                                    admissionFee:studentData?.stuGender=="Female"?"0":studentData?.stuCategory=="ST"?"0":studentData?.stuCategory=="SC"?"0": ''
 
                                 }}
                                 validationSchema={validationSchema}
@@ -303,34 +399,34 @@ const AddAdmission = () => {
                                     setLoading(true)
 
                                     try {
-                                        const data = {
-                                            slNo: "123",
-                                            stuUAN: values.uan.trim(),
-                                            stuStream: values.stream.trim(),
-                                            stuSemester: values.semester.trim(),
-                                            stuMajorPaper: values.majorPaper.trim(),
-                                            stuBloodGroup: values.bloodGroup.trim(),
-                                            stuAadharNo: values.stuAadharNo.trim(),
-                                            motherAadharNo: values.motherAadhar.trim(),
-                                            fatherAadharNo: values.fatherAadhar.trim(),
-                                            stuIdMarks: values.identiMark.trim(),
-                                            postOffice: values.pOffice.trim(),
-                                            policeStation: values.psOffice.trim(),
-                                            pinCode: values.pinCode.trim(),
-                                            state: values.state.trim(),
-                                            district: values.district.trim(),
-                                        }
-
-                                        const res = await addDocument(AdmissionCollectionId, data)
-                                        if (res == "Document Added") {
-                                            router.back()
-                                        }
+                                        // const data = {
+                                        //     slNo: "123",
+                                        //     stuUAN: values.uan.trim(),
+                                        //     stuStream: values.stream.trim(),
+                                        //     stuSemester: values.semester.trim(),
+                                        //     stuMajorPaper: values.majorPaper.trim(),
+                                        //     stuBloodGroup: values.bloodGroup.trim(),
+                                        //     stuAadharNo: values.stuAadharNo.trim(),
+                                        //     motherAadharNo: values.motherAadhar.trim(),
+                                        //     fatherAadharNo: values.fatherAadhar.trim(),
+                                        //     stuIdMarks: values.identiMark.trim(),
+                                        //     postOffice: values.pOffice.trim(),
+                                        //     policeStation: values.psOffice.trim(),
+                                        //     pinCode: values.pinCode.trim(),
+                                        //     state: values.state.trim(),
+                                        //     district: values.district.trim(),
+                                        // }
+                                        console.log(values)
+                                        // const res = await addDocument(AdmissionCollectionId, data)
+                                        // if (res == "Document Added") {
+                                        //     router.back()
+                                        // }
                                     } catch (error) {
                                         console.log(error)
                                     } finally {
                                         setLoading(false)
                                     }
-                                    console.log(data)
+                                    // console.log(data)
                                     // Alert.alert('Form Submitted', JSON.stringify(values));
                                 }}
                             >
@@ -342,7 +438,14 @@ const AddAdmission = () => {
                                     errors,
                                     touched,
                                     handleBlur
-                                }) => (
+                                }) => {
+                                    // if(studentData?.stuGender=="Female" || studentData?.stuCategory=="ST" || studentData?.stuCategory=="SC"){
+                                    //     setFieldValue("admissionFee","0")
+                                    // }else{
+                                    //     setFieldValue("admissionFee","")
+                                    // }
+
+return(
                                     <View style={{ marginTop: 10 }}>
 
                                         <CustomInput
@@ -528,42 +631,45 @@ const AddAdmission = () => {
 
 
 
-                                        <Text style={styles.label}>
-                                            Select Stream.<Text style={styles.badge}>*</Text>
-                                        </Text>
 
-
-                                        <View >
-
-                                            <RadioButton.Group onValueChange={(val) => setFieldValue('stream', val)}
-                                                value={values.stream}>
-                                                <View style={styles.groupData}>
-
-
-                                                    <View style={{ flexDirection: 'row' }}>
-                                                        <RadioButton value="ARTS" color='#690405' />
-                                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>ARTS</Text>
-
-                                                    </View>
-
-
-                                                    <View style={{ flexDirection: 'row' }}>
-                                                        <RadioButton value="SCIENCE" color='#690405' />
-                                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>SCIENCE</Text>
-
-                                                    </View>
-
-                                                    <View style={{ flexDirection: 'row' }}>
-                                                        <RadioButton value="COMMERCE" color='#690405' />
-                                                        <Text style={[styles.labelRedio, { marginTop: 8 }]}>COMMERCE</Text>
-
-                                                    </View>
-                                                </View>
-                                            </RadioButton.Group>
+                                        <View style={{ marginTop: 10 }}>
+                                            <CustomInput
+                                                title="SKill Enhancement Course (SEC)"
+                                                required={true}
+                                                onChangeText={handleChange('secSubject')}
+                                                onBlur={handleBlur('secSubject')}
+                                                values={values.secSubject}
+                                                placeholder="Enter SKill Enhancement Course"
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType="default"
+                                                badgeStyles={styles.badge}
+                                                editable={false}
+                                            />
+                                            {touched.secSubject && errors.secSubject && (
+                                                <Text style={{ color: 'red', marginTop: 5 }}>{errors.secSubject}</Text>
+                                            )}
                                         </View>
-                                        {touched.stream && errors.stream && (
-                                            <Text style={{ color: 'red' }}>{errors.stream}</Text>
-                                        )}
+
+                                        <View style={{ marginTop: 10 }}>
+                                            <CustomInput
+                                                title="Value Added Course (VAC)"
+                                                required={true}
+                                                onChangeText={handleChange('vacSubject')}
+                                                onBlur={handleBlur('vacSubject')}
+                                                values={values.vacSubject}
+                                                placeholder="Enter Value Added Course"
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType="default"
+                                                badgeStyles={styles.badge}
+                                                editable={false}
+                                            />
+                                            {touched.vacSubject && errors.vacSubject && (
+                                                <Text style={{ color: 'red', marginTop: 5 }}>{errors.vacSubject}</Text>
+                                            )}
+                                        </View>
+
 
 
                                         <CategorySelectList
@@ -579,8 +685,283 @@ const AddAdmission = () => {
                                         )}
 
 
+                                        <CategorySelectList
+                                            label="Select Stream."
+                                            data={StreamData}
+                                            selectedValue={values.bloodGroup}
+                                            onSelect={(val) => handleMJCChange(val, setFieldValue)}
+                                            search={false}
+                                            required={true}
+                                        />
+                                        {touched.stream && errors.stream && (
+                                            <Text style={{ color: 'red' }}>{errors.stream}</Text>
+                                        )}
 
-                                        <View>
+
+                                        {/* <CategorySelectList
+                                                label="Select Major Paper. (MJC)"
+                                                data={StreamData}
+                                                selectedValue={values.bloodGroup}
+                                                onSelect={(val) => handleMJCChange(val, setFieldValue)}
+                                                search={false}
+                                                required={true}
+                                            />
+                                            {touched.stream && errors.stream && (
+                                                <Text style={{ color: 'red' }}>{errors.stream}</Text>
+                                            )} */}
+
+
+                                        <CategorySelectList
+                                            label="Select Major Paper. (MJC)"
+
+                                            data={subject.map(data => ({ key: data, value: data }))}
+                                            selectedValue={values.majorPaper}
+
+
+                                            onSelect={(val) => setFieldValue('majorPaper', val)} // Handle district selection
+
+                                            required={true}
+                                            search={true}
+                                        />
+                                        {touched.majorPaper && errors.majorPaper && (
+                                            <Text style={{ color: 'red' }}>{errors.majorPaper}</Text>
+                                        )}
+
+
+
+
+                                        <CategorySelectList
+                                            label="Select Minor Paper. (MIC)"
+
+                                            data={subject.filter(data => data !== values.majorPaper).map(data => ({ key: data, value: data }))}
+                                            selectedValue={values.micSubject}
+
+
+                                            onSelect={(val) => setFieldValue('micSubject', val)} // Handle district selection
+
+                                            required={true}
+                                            search={true}
+                                        />
+                                        {touched.micSubject && errors.micSubject && (
+                                            <Text style={{ color: 'red' }}>{errors.micSubject}</Text>
+                                        )}
+
+
+                                        <CategorySelectList
+                                            label="Select Multi Disciplinary Course. (MDC)"
+
+                                            data={mdcSubject.map(data => ({ key: data, value: data }))}
+                                            selectedValue={values.mdcSubject}
+
+
+                                            onSelect={(val) => setFieldValue('mdcSubject', val)} // Handle district selection
+
+                                            required={true}
+                                            search={true}
+                                        />
+                                        {touched.mdcSubject && errors.mdcSubject && (
+                                            <Text style={{ color: 'red' }}>{errors.mdcSubject}</Text>
+                                        )}
+
+                                        {values.semester === "I" && (
+                                            <>
+                                                <CategorySelectList
+                                                    label="Select Semester I AEC Subject"
+
+                                                    data={extraSubjectData1}
+                                                    selectedValue={values.extraSubject}
+
+
+                                                    onSelect={(val) => setFieldValue('extraSubject', val)} // Handle district selection
+
+                                                    required={true}
+                                                    search={true}
+                                                />
+                                                {touched.extraSubject && errors.extraSubject && (
+                                                    <Text style={{ color: 'red' }}>{errors.extraSubject}</Text>
+                                                )}
+                                            </>
+                                        )}
+
+
+                                        {values.semester === "II" && (
+                                            <>
+                                                <CategorySelectList
+                                                    label="Select Semester II AEC Subject"
+
+                                                    data={extraSubjectData1}
+                                                    selectedValue={values.extraSubject}
+
+
+                                                    onSelect={(val) => setFieldValue('extraSubject', val)} // Handle district selection
+
+                                                    required={true}
+                                                    search={true}
+                                                />
+                                                {touched.extraSubject && errors.extraSubject && (
+                                                    <Text style={{ color: 'red' }}>{errors.extraSubject}</Text>
+                                                )}
+                                            </>
+                                        )}
+
+
+                                        {values.semester === "III" && (
+                                            <>
+                                                <CategorySelectList
+                                                    label="Select Semester III AEC Subject"
+
+                                                    data={extraSubjectData1}
+                                                    selectedValue={values.extraSubject}
+
+
+                                                    onSelect={(val) => setFieldValue('extraSubject', val)} // Handle district selection
+
+                                                    required={true}
+                                                    search={true}
+                                                />
+                                                {touched.extraSubject && errors.extraSubject && (
+                                                    <Text style={{ color: 'red' }}>{errors.extraSubject}</Text>
+                                                )}
+                                            </>
+                                        )}
+
+
+                                        {values.semester === "IV" && (
+                                            <>
+                                                <CategorySelectList
+                                                    label="Select Semester IV AEC Subject"
+
+                                                    data={extraSubjectData1}
+                                                    selectedValue={values.extraSubject}
+
+
+                                                    onSelect={(val) => setFieldValue('extraSubject', val)} // Handle district selection
+
+                                                    required={true}
+                                                    search={true}
+                                                />
+                                                {touched.extraSubject && errors.extraSubject && (
+                                                    <Text style={{ color: 'red' }}>{errors.extraSubject}</Text>
+                                                )}
+                                            </>
+                                        )}
+
+                                        {values.semester === "V" && (
+                                            <>
+                                                <CategorySelectList
+                                                    label="Select Semester V AEC Subject"
+
+                                                    data={extraSubjectData1}
+                                                    selectedValue={values.extraSubject}
+
+
+                                                    onSelect={(val) => setFieldValue('extraSubject', val)} // Handle district selection
+
+                                                    required={true}
+                                                    search={true}
+                                                />
+                                                {touched.extraSubject && errors.extraSubject && (
+                                                    <Text style={{ color: 'red' }}>{errors.extraSubject}</Text>
+                                                )}
+                                            </>
+                                        )}
+                                        {values.semester === "VI" && (
+                                            <>
+                                                <CategorySelectList
+                                                    label="Select Semester VI AEC Subject"
+
+                                                    data={extraSubjectData1}
+                                                    selectedValue={values.extraSubject}
+
+
+                                                    onSelect={(val) => setFieldValue('extraSubject', val)} // Handle district selection
+
+                                                    required={true}
+                                                    search={true}
+                                                />
+                                                {touched.extraSubject && errors.extraSubject && (
+                                                    <Text style={{ color: 'red' }}>{errors.extraSubject}</Text>
+                                                )}
+                                            </>
+                                        )}
+
+                                        {values.semester === "VII" && (
+                                            <>
+                                                <CategorySelectList
+                                                    label="Select Semester VII AEC Subject"
+
+                                                    data={extraSubjectData1}
+                                                    selectedValue={values.extraSubject}
+
+
+                                                    onSelect={(val) => setFieldValue('extraSubject', val)} // Handle district selection
+
+                                                    required={true}
+                                                    search={true}
+                                                />
+                                                {touched.extraSubject && errors.extraSubject && (
+                                                    <Text style={{ color: 'red' }}>{errors.extraSubject}</Text>
+                                                )}
+                                            </>
+                                        )}
+
+
+                                        {values.semester === "VIII" && (
+                                            <>
+                                                <CategorySelectList
+                                                    label="Select Semester VIII AEC Subject"
+
+                                                    data={extraSubjectData1}
+                                                    selectedValue={values.extraSubject}
+
+
+                                                    onSelect={(val) => setFieldValue('extraSubject', val)} // Handle district selection
+
+                                                    required={true}
+                                                    search={true}
+                                                />
+                                                {touched.extraSubject && errors.extraSubject && (
+                                                    <Text style={{ color: 'red' }}>{errors.extraSubject}</Text>
+                                                )}
+                                            </>
+                                        )}
+
+                                        {/* 
+<View >
+
+<RadioButton.Group onValueChange={(val) => setFieldValue('stream', val)}
+    value={values.stream}>
+    <View style={styles.groupData}>
+
+
+        <View style={{ flexDirection: 'row' }}>
+            <RadioButton value="ARTS" color='#690405' />
+            <Text style={[styles.labelRedio, { marginTop: 8 }]}>ARTS</Text>
+
+        </View>
+
+
+        <View style={{ flexDirection: 'row' }}>
+            <RadioButton value="SCIENCE" color='#690405' />
+            <Text style={[styles.labelRedio, { marginTop: 8 }]}>SCIENCE</Text>
+
+        </View>
+
+        <View style={{ flexDirection: 'row' }}>
+            <RadioButton value="COMMERCE" color='#690405' />
+            <Text style={[styles.labelRedio, { marginTop: 8 }]}>COMMERCE</Text>
+
+        </View>
+    </View>
+</RadioButton.Group>
+</View>
+{touched.stream && errors.stream && (
+<Text style={{ color: 'red' }}>{errors.stream}</Text>
+)} */}
+
+
+
+                                        {/* <View>
 
 
                                             <CustomInput
@@ -601,6 +982,7 @@ const AddAdmission = () => {
                                             )}
                                         </View>
 
+ */}
 
 
 
@@ -745,7 +1127,7 @@ const AddAdmission = () => {
                                                     required={true}
                                                     onChangeText={handleChange('motherOccupation')}
                                                     onBlur={handleBlur('motherOccupation')}
-                                                    values={values.fatherOccupation}
+                                                    values={values.motherOccupation}
                                                     placeholder="Enter Mother`s Occupation"
                                                     labelsStyle={styles.labelsStyle}
                                                     inputStyle={styles.inputStyle}
@@ -815,7 +1197,7 @@ const AddAdmission = () => {
                                                 <CustomInput
                                                     title="Father`s Occupation"
                                                     required={true}
-                                                    onChangeText={handleChange('fatherOccupation ')}
+                                                    onChangeText={handleChange('fatherOccupation')}
                                                     onBlur={handleBlur('fatherOccupation')}
                                                     values={values.fatherOccupation}
                                                     placeholder="Enter Father`s Occupation"
@@ -1474,6 +1856,22 @@ const AddAdmission = () => {
 
 
 
+                                        <View style={styles.inputView}>
+                                            <CustomInput
+                                                title="Admission Fee"
+                                                required={true}
+                                                onChangeText={handleChange('admissionFee')}
+                                                onBlur={handleBlur('admissionFee')}
+                                                values={values.admissionFee}
+                                                placeholder="Enter Migration Issue Date."
+                                                labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                            />
+                                            {touched.admissionFee && errors.admissionFee && (
+                                                <Text style={{ color: 'red' }}>{errors.admissionFee}</Text>
+                                            )}
+                                        </View>
 
 
 
@@ -1493,7 +1891,10 @@ const AddAdmission = () => {
 
                                     </View>
 
-                                )}
+                                )
+                            }
+                                
+                                }
                             </Formik>
 
 

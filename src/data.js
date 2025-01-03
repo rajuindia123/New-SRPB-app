@@ -937,7 +937,7 @@ export const SubjectOfferedData={
    "subjects":[  
       {  
          "subject":"Arts",
-         "artsSubject":[  
+         "subSubject":[  
             "Geography",
             "Ancient Indian & Culture",
             "History",
@@ -954,6 +954,24 @@ export const SubjectOfferedData={
             "Home Science",
             "Philosophy",
             "Mathematics",
+         ]
+      },
+      {  
+         "subject":"Science",
+         "subSubject":[  
+            "Physics",
+            "Chemistry",
+            "Zoology",
+            "Botany",
+            "Mathematice",
+         ]
+      },
+      {  
+         "subject":"Commerce",
+         "subSubject":[  
+            "Accounting And Finance",
+            "Marketing",
+            "Human Resource Management",
          ]
       },
       

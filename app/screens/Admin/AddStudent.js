@@ -17,6 +17,8 @@ const EnrollmentStuSchema = Yup.object().shape({
     stuName: Yup.string().required('Please Enter Student Name'),
     stuFatherName: Yup.string().required('Please Enter Student Father`s Name'),
     stuMotherName: Yup.string().required('Please Enter Student Mother`s Name'),
+    stuVAC: Yup.string().required('Please Enter Value Added Course'),
+    stuSEC: Yup.string().required('Please Enter Skill Enhancement Course'),
     stuGender: Yup.string().required('Please Select Gender'),
     stuCategory: Yup.string().required('Please Select Category'),
     stuPassword: Yup.string().required('Please Enter Password'),
@@ -91,6 +93,8 @@ const AddStudent = () => {
                     stuSession: '',
                     stuCollege: '',
                     stuPassword: '',
+                    stuVAC: '',
+                    stuSEC: '',
                 }}
                 validationSchema={EnrollmentStuSchema}
                 onSubmit={async (values) => {
@@ -110,7 +114,9 @@ Alert.alert("Error","Please Enter Date Of Birth")
                             stuSession: values.stuSession.trim(),
                             stuCollegeName: values.stuCollege.trim(),
                             stuPassword: values.stuPassword.trim(),
-                            stuDOB:selectedDate
+                            stuDOB:selectedDate,
+                            stuVAC:values.stuVAC.trim(),
+                            stuSEC:values.stuSEC.trim(),
                         };
                    
                 const res=await addStudentDocument("67644c3d002c8007fd51",trimmedValues)
@@ -334,6 +340,45 @@ Alert.alert("Error","Please Enter Date Of Birth")
                             {touched.stuPassword && errors.stuPassword && (
                                 <Text style={{ color: 'red', marginTop: 5 }}>{errors.stuPassword}</Text>
                             )}
+
+<CustomInput
+                                title="Skill Enhancement Course (stuSEC)"
+                                required={true}
+                                onChangeText={handleChange('stuSEC')}
+                                onBlur={handleBlur('stuSEC')}
+                                value={values.stuSEC}
+                                placeholder="Enter Skill Enhancement Course"
+                                labelsStyle={styles.labelsStyle}
+                                inputStyle={styles.inputStyle}
+                                keyboardType="default"
+                                badgeStyles={styles.badge}
+                            />
+                            {touched.stuSEC && errors.stuSEC && (
+                                <Text style={{ color: 'red', marginTop: 5 }}>{errors.stuSEC}</Text>
+                            )}
+
+<CustomInput
+                                title="Value Added Course (stuVAC)"
+                                required={true}
+                                onChangeText={handleChange('stuVAC')}
+                                onBlur={handleBlur('stuVAC')}
+                                value={values.stuSEC}
+                                placeholder="Enter Value Added Course"
+                                labelsStyle={styles.labelsStyle}
+                                inputStyle={styles.inputStyle}
+                                keyboardType="default"
+                                badgeStyles={styles.badge}
+                            />
+                            {touched.stuVAC && errors.stuVAC && (
+                                <Text style={{ color: 'red', marginTop: 5 }}>{errors.stuVAC}</Text>
+                            )}
+
+
+
+
+
+
+
 
 
 <View >
