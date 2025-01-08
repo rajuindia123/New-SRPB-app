@@ -8,7 +8,7 @@ import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { router } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { addDocument, getDocumentsById } from '../../Function/AppwriteCollection';
+import { addDocument, getDocumentsById,addAddmistion } from '../../Function/AppwriteCollection';
 import Loader from '../../components/Loader';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -68,6 +68,8 @@ const validationSchema = Yup.object().shape({
     institutionState: Yup.string().required('Institution State is required'),
     institutionDistrict: Yup.string().required('Institution District is required'),
     matricInstitutionCode: Yup.string().required('Institution Code is required'),
+
+    
     interBoardName: Yup.string().required('Board Name is required'),
     interPassingYear: Yup.string().required('Passing Year is required'),
     interRollNo: Yup.string().required('Roll No is required'),
@@ -82,6 +84,7 @@ const validationSchema = Yup.object().shape({
     interMigrationIssueDate: Yup.string().required('Issue Date is required'),
     interInstitutionState: Yup.string().required('Institution State is required'),
     interInstitutionDistrict: Yup.string().required('Institution District is required'),
+
     micSubject: Yup.string().required('MIC Subject is required'),
     mdcSubject: Yup.string().required('MDC Subject is required'),
     secSubject: Yup.string().required('SEC Subject is required'),
@@ -261,7 +264,7 @@ const AddAdmission = () => {
 
 
     const handelSearchData = async () => {
-        console.log("search", search)
+        // console.log("search", search)
         setLoading(true);
         try {
             const result = await getDocumentsById(EnrollmentStudentsCollectionId, "stuUAN", search);
@@ -269,7 +272,7 @@ const AddAdmission = () => {
                 // console.log("object")
                 setError("Student UAN No. Not Found  Please Check UAN No")
             } else {
-                console.log(result)
+                // console.log(result)
                 setStudentData(result[0])
                 setSelectedDate(result[0]?.stuDOB || ''); // Set the date if present
                 setSection(result[0].stuSession)
@@ -348,6 +351,7 @@ const AddAdmission = () => {
                                     state: '',
                                     district: '',
                                     stuCategory: studentData?.stuCategory || '',
+
                                     mobNo: '',
                                     whatsappNo: '',
                                     emailId: '',
@@ -357,6 +361,7 @@ const AddAdmission = () => {
                                     fatherOccupation: '',
                                     motherOccupation: '',
                                     motherMobNo: '',
+
                                     bankName: '',
                                     acHolderName: '',
                                     accountNumber: '',
@@ -369,9 +374,10 @@ const AddAdmission = () => {
                                     matricRollCode: '',
                                     matricMarks: '',
                                     matricPercentage: '',
-                                    institutionState: '',
-                                    institutionDistrict: '',
                                     matricInstitutionCode: '',
+                                    institutionState: '',
+                                    institutionDistrict: '', 
+
                                     interBoardName: '',
                                     interPassingYear: '',
                                     interRollNo: '',
@@ -386,6 +392,7 @@ const AddAdmission = () => {
                                     interMigrationIssueDate: '',
                                     interInstitutionState: '',
                                     interInstitutionDistrict: '',
+                                    
                                     micSubject: '',
                                     mdcSubject: '',
                                     secSubject: studentData?.stuSEC || '',
@@ -399,28 +406,86 @@ const AddAdmission = () => {
                                     setLoading(true)
 
                                     try {
-                                        // const data = {
-                                        //     slNo: "123",
-                                        //     stuUAN: values.uan.trim(),
-                                        //     stuStream: values.stream.trim(),
-                                        //     stuSemester: values.semester.trim(),
-                                        //     stuMajorPaper: values.majorPaper.trim(),
-                                        //     stuBloodGroup: values.bloodGroup.trim(),
-                                        //     stuAadharNo: values.stuAadharNo.trim(),
-                                        //     motherAadharNo: values.motherAadhar.trim(),
-                                        //     fatherAadharNo: values.fatherAadhar.trim(),
-                                        //     stuIdMarks: values.identiMark.trim(),
-                                        //     postOffice: values.pOffice.trim(),
-                                        //     policeStation: values.psOffice.trim(),
-                                        //     pinCode: values.pinCode.trim(),
-                                        //     state: values.state.trim(),
-                                        //     district: values.district.trim(),
-                                        // }
-                                        console.log(values)
-                                        // const res = await addDocument(AdmissionCollectionId, data)
-                                        // if (res == "Document Added") {
-                                        //     router.back()
-                                        // }
+                                        const bankDetailsData = [{
+                                            bankName: values.bankName,
+                                            acHolderName: values.acHolderName,
+                                            accountNumber: values.accountNumber,
+                                            ifscNo: values.ifscNo,
+                                            branchName: values.branchName
+                                          }];
+                                        
+                                          const matricDetailsData = [{
+                                            matricBoardName: values.matricBoardName,
+                                            matricPassingYear: values.matricPassingYear,
+                                            matriRollNo: values.matriRollNo,
+                                            matricRollCode: values.matricRollCode,
+                                            matricMarks: values.matricMarks,
+                                            matricPercentage: values.matricPercentage,
+                                            matricInstitutionCode: values.matricInstitutionCode,
+                                            institutionState: values.institutionState,
+                                            institutionDistrict: values.institutionDistrict
+                                          }];
+                                        
+                                          const interDetailsData = [{
+                                            interBoardName: values.interBoardName,
+                                            interPassingYear: values.interPassingYear,
+                                            interRollNo: values.interRollNo,
+                                            interRollCode: values.interRollCode,
+                                            interMarks: values.interMarks,
+                                            interPercentage: values.interPercentage,
+                                            interInstitutionCode: values.interInstitutionCode,
+                                            interCLCNo: values.interCLCNo,
+                                            interTCNo: values.interTCNo,
+                                            interCLCTCIssueDate: values.interCLCTCIssueDate,
+                                            interMigrationNo: values.interMigrationNo,
+                                            interMigrationIssueDate: values.interMigrationIssueDate,
+                                            interInstitutionState: values.interInstitutionState,
+                                            interInstitutionDistrict: values.interInstitutionDistrict
+                                          }];
+                                            // Serialize arrays to strings if the fields are strings in the Appwrite schema
+//   const serializedBankDetails = JSON.stringify(bankDetailsData);
+//   const serializedMatricDetails = JSON.stringify(matricDetailsData);
+//   const serializedInterDetails = JSON.stringify(interDetailsData);
+
+                                        const data = {
+                                            slNo:"1",
+                                            stuUAN: values.uan.trim(),
+                                            stuStream: values.stream.trim(),
+                                            stuSemester: values.semester.trim(),
+                                            stuMajorPaper: values.majorPaper.trim(),
+                                            stuBloodGroup: values.bloodGroup.trim(),
+                                            stuAadharNo: values.stuAadharNo.trim(),
+                                            motherAadharNo: values.motherAadhar.trim(),
+                                            fatherAadharNo: values.fatherAadhar.trim(),
+                                            stuIdMarks: values.identiMark.trim(),
+                                            state: values.state.trim(),
+                                            district: values.district.trim(),
+                                            stuMobNo:values.mobNo,
+                                            stuWhatsapp:values.whatsappNo,
+                                            stuEmail:values.emailId,
+                                            religion:values.religion,
+                                            maritalStatus:values.maritalStatus,
+                                            minorPaper:values.micSubject,
+                                            mdCourse:values.mdcSubject,
+                                            motherMobNo:values.motherMobNo,
+                                            fatherMobNo:values.fatherMobNo,
+                                            motherOccupation:values.motherOccupation,
+                                            fatherOccupation:values.fatherOccupation,
+                                            corressFullAdress:values.corAddress,
+                                            perFullAdress:values.perAddress,
+                                            bankDetails:serializedBankDetails,
+                                            matricDetails:serializedMatricDetails,
+                                            interDetails:serializedInterDetails,
+                                            admissionFee:values.admissionFee,
+                                            addedTo:'Admin',
+                                            semSubject:values.extraSubject,
+                                        }
+                                        // console.log(data)
+                                        const res = await addAddmistion(AdmissionCollectionId, data)
+                                        console.log(res)
+                                        if (res == "Document Added") {
+                                            router.back()
+                                        }
                                     } catch (error) {
                                         console.log(error)
                                     } finally {
@@ -688,7 +753,7 @@ return(
                                         <CategorySelectList
                                             label="Select Stream."
                                             data={StreamData}
-                                            selectedValue={values.bloodGroup}
+                                            selectedValue={values.stream}
                                             onSelect={(val) => handleMJCChange(val, setFieldValue)}
                                             search={false}
                                             required={true}
@@ -762,6 +827,9 @@ return(
                                         {touched.mdcSubject && errors.mdcSubject && (
                                             <Text style={{ color: 'red' }}>{errors.mdcSubject}</Text>
                                         )}
+
+
+                                        
 
                                         {values.semester === "I" && (
                                             <>
@@ -926,6 +994,14 @@ return(
                                             </>
                                         )}
 
+
+
+
+
+
+
+
+
                                         {/* 
 <View >
 
@@ -1056,7 +1132,7 @@ return(
                                                     placeholder="Enter Aadhar Number"
                                                     labelsStyle={styles.labelsStyle}
                                                     inputStyle={styles.inputStyle}
-                                                    keyboardType="default"
+                                                    keyboardType="number-pad"
                                                     badgeStyles={styles.badge}
                                                     editable={true}
                                                 />
@@ -1083,7 +1159,7 @@ return(
                                                     placeholder="Enter Mother`s Aadhar Number"
                                                     labelsStyle={styles.labelsStyle}
                                                     inputStyle={styles.inputStyle}
-                                                    keyboardType="default"
+                                                   keyboardType="number-pad"
                                                     badgeStyles={styles.badge}
                                                     editable={true}
                                                 />
@@ -1155,7 +1231,7 @@ return(
                                                     placeholder="Enter Father`s Aadhar Number"
                                                     labelsStyle={styles.labelsStyle}
                                                     inputStyle={styles.inputStyle}
-                                                    keyboardType="default"
+                                                   keyboardType="number-pad"
                                                     badgeStyles={styles.badge}
                                                     editable={true}
                                                 />
@@ -1323,13 +1399,13 @@ return(
                                             <View style={styles.inputView}>
 
                                                 <CustomInput
-                                                    title="A/C Holder"
+                                                    title="A/C Holder Nmae"
                                                     required={true}
                                                     onChangeText={handleChange('acHolderName')}
                                                     onBlur={handleBlur('acHolderName')}
                                                     values={values.acHolderName}
 
-                                                    placeholder="Enter Bank Holder Name"
+                                                    placeholder="Enter A/C Holder Name"
                                                     labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
                                                     keyboardType={'default'}
                                                     badgeStyles={styles.badge}

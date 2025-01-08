@@ -4,7 +4,8 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect, useState } from 'react';
-
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     'PTSerifRegular': require('../assets/font/PTSerif-Regular.ttf'),
@@ -26,7 +27,8 @@ export default function RootLayout() {
 
   return (
     <>
-      <Stack
+    <Provider store={store}>
+    <Stack
         screenOptions={{
           headerStyle: {
             backgroundColor: '#690405',
@@ -49,6 +51,8 @@ export default function RootLayout() {
 
       </Stack>
       <StatusBar style="light" backgroundColor='#690405' />
+    </Provider>
+     
     </>
 
   );

@@ -71,11 +71,12 @@ const styles = StyleSheet.create({
         fontSize: 8,
     },
     headerView2: {
-
+width:160,
         backgroundColor: Colors.primary,
         height: 20,
         borderRadius: 2,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        alignItems:'center'
     },
     subHeaderAddressText: {
         textAlign: "center",
@@ -250,6 +251,28 @@ const styles = StyleSheet.create({
         // textShadowOffset: { width: 0, height: 4 },
         // textShadowRadius: 4,
     },
+    buttonStyleBack: {
+        alignItems: "center",
+        // backgroundColor: Colors.primary,
+        justifyContent: "center",
+        height: 50,
+        borderColor: Colors.primary,
+        borderRadius: 5,
+        marginRight: 10,
+        marginTop: 20,
+        borderWidth:2,
+        // margin:30
+    },
+    buttonStyleTextBack: {
+        fontSize: 16,
+        fontFamily: FontFamiles.PTSerifBold,
+        // fontWeight:'600',
+        // // textTransform: 'uppercase',
+        color: Colors.primary,
+        // textShadowColor: 'rgba(0, 0, 0, 0.25)',
+        // textShadowOffset: { width: 0, height: 4 },
+        // textShadowRadius: 4,
+    },
     regAppliForm:{
 
         width:'100%',
@@ -302,7 +325,68 @@ const styles = StyleSheet.create({
         fontSize:16,
         fontFamily:FontFamiles.PTSerifBold,
         textAlign:'justify',
-      }
+      },
+
+      stepNavigation: {
+        alignItems: 'center',
+        marginBottom: 20,
+      },
+      stepLabel: {
+        fontSize: 18,
+        fontWeight: 'bold',
+      },
+      progressBar: {
+        flexDirection: 'row',
+        marginTop: 10,
+      },
+      progressStep: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        marginHorizontal: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      activeStep: {
+        backgroundColor: 'green',
+      },
+      inactiveStep: {
+        backgroundColor: 'gray',
+      },
+      currentStepText: {
+        color: '#fff',
+        fontWeight: 'bold',
+      },
+      header: {
+        fontSize: 20,
+        // fontWeight: 'bold',
+        marginBottom: 10,
+        textAlign:'center',
+        fontFamily:FontFamiles.PTSerifBold
+      },
+      headerMatric:{
+        marginTop:10,
+fontSize:14,
+fontFamily:FontFamiles.PTSerifBold
+      },
+      input: {
+        height: 40,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        marginBottom: 10,
+        paddingLeft: 8,
+        borderRadius: 5,
+      },
+      error: {
+        color: 'red',
+        fontSize: 12,
+        marginBottom: 10,
+      },
+      buttonContainer: {
+        marginTop: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+      },
 
 
 });

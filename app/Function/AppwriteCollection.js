@@ -11,7 +11,7 @@ export const addDocument = async (collectionId, data) => {
       'unique()', // Generates a unique document ID
       data
     );
-    console.log('Document Added:', response);
+    // console.log('Document Added:', response);
     return "Document Added"
  
   } catch (error) {
@@ -19,6 +19,53 @@ export const addDocument = async (collectionId, data) => {
     return error
   }
 };
+
+export const addAddmistion = async (collectionId, data) => {
+  try {
+    // let slNo = "1";
+    const existingDocuments = await databases.listDocuments(
+      databaseId, 
+      collectionId,
+      [
+        // Query for matching stuUAN or stuRankNo
+        Query.equal('stuSemester', data.stuSemester),
+       
+      ]
+    );
+
+    if (existingDocuments.total > 0) {
+      return "This Semester Already Exists."; // Clear user-friendly messag
+      // throw new Error('Student UAN No. Already Exists.');
+    }
+
+
+    // const sortedDocuments = existingDocuments.documents.sort((a, b) => {
+    //   // Compare stuRankNo as strings, converting them to numbers for comparison
+    //   return parseInt(b.slNo) - parseInt(a.slNo);
+    // });
+
+    // // Increment the highest stuRankNo (parse it as a number first)
+    // slNo = (parseInt(sortedDocuments[0].slNo) + 1).toString(); // Convert back to string
+
+
+  
+
+    const response = await databases.createDocument(
+      databaseId, 
+      collectionId, 
+      'unique()', // Generates a unique document ID
+      data
+    );
+    // console.log('Document Added:', response);
+    return "Document Added Successfully";  // Success message
+
+ 
+  } catch (error) {
+    console.log(error)
+    return `Error: ${error.message || 'An error occurred while adding the document.'}`;
+  }
+};
+
 
 export const addStudentDocument = async (collectionId, data) => {
   try {
@@ -72,7 +119,7 @@ export const getDocuments = async (collectionId) => {
   export const updateDocument = async (collectionId, documentId, data) => {
     try {
       const response = await databases.updateDocument(databaseId, collectionId, documentId, data);
-      console.log('Document Updated:', response);
+      // console.log('Document Updated:', response);
       return "Document Updated";
     } catch (error) {
         console.error('Error Updating Document:', error);
