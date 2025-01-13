@@ -4,6 +4,7 @@ import educationalDetailsReducer from './features/educationalDetailsSlice';
 import subjectDetailsReducer from './features/subjectDetailsSlice';
 import bankDetailsReducer from './features/bankDetailsSlice';
 import feeStructureReducer from './features/feeStructureSlice';
+import documentUploadReducer from './features/documentUploadSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,5 +13,6 @@ export const store = configureStore({
     subjectDetails: subjectDetailsReducer,
     bankDetails: bankDetailsReducer,
     feeStructure: feeStructureReducer,
+    documentUpload:documentUploadReducer
   },
 });

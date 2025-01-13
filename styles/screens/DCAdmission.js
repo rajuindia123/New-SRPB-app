@@ -231,10 +231,11 @@ width:160,
         // marginBottom:10,
     },
     buttonStyle: {
+      padding:10,
         alignItems: "center",
         backgroundColor: Colors.primary,
         justifyContent: "center",
-        height: 50,
+        height: 'auto',
         borderColor: Colors.primary,
         borderRadius: 5,
         marginRight: 10,
@@ -253,9 +254,10 @@ width:160,
     },
     buttonStyleBack: {
         alignItems: "center",
+        padding:10,
         // backgroundColor: Colors.primary,
         justifyContent: "center",
-        height: 50,
+  height: 'auto',
         borderColor: Colors.primary,
         borderRadius: 5,
         marginRight: 10,
@@ -437,6 +439,13 @@ fontFamily:FontFamiles.PTSerifBold
         // paddingTop:20,
         color: 'blue'
       },
+      closeIcon:{
+        justifyContent:'flex-end',
+        alignItems:"flex-end",
+        width:'100%',
+        marginBottom:10,
+
+      }
 
 
 });

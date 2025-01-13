@@ -20,6 +20,7 @@ import { updateInterData, updateMatricData, resetAcademicData } from '../../redu
 import { saveBankDetails, resetBankDetails } from '../../redux/features/bankDetailsSlice';
 import { savesubjectDetails, resetsubjectDetails } from '../../redux/features/subjectDetailsSlice';
 import { saveFeeStructure, resetFeeStructure } from '../../redux/features/feeStructureSlice';
+import { saveDocumentUpload, resetDocumentUpload } from '../../redux/features/documentUploadSlice';
 import { useDispatch, } from 'react-redux';
 import { useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,7 +28,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
-
+import AntDesign from '@expo/vector-icons/AntDesign';
 const step1ValidationSchema = Yup.object().shape({
     candidateName: Yup.string().required('Full Name is required'),
     uan: Yup.string().required('UAN No. is required'),
@@ -126,7 +127,7 @@ const validationSchemaUpload = Yup.object().shape({
     univCard: Yup.string().required('University Apply Card is required'),
     univRankCard: Yup.string().required('University Rank Card is required'),
     photo: Yup.string().required('Passport Size Photo is required'),
-    singnecher: Yup.string().required('Singnecher Photo is required'),
+    signature: Yup.string().required('signature Photo is required'),
 
 });
 
@@ -210,7 +211,7 @@ const ACAdmission = () => {
     const [interInstitutionDistricts, seInterInstitutionDistricts] = useState([]);
     const [subject, setSubject] = useState([]);
     const [mdcSubject, setMdcSubject] = useState([]);
-    const totalSteps = 7;
+    const totalSteps = 8;
     const [section, setSection] = useState("-")
     const [studentData, setStudentData] = useState(null)
     const [search, onSearchText] = React.useState('');
@@ -292,6 +293,7 @@ const ACAdmission = () => {
     };
 
     const handlePreviousStep = () => {
+        // console.log("currentStep",currentStep)
         if (currentStep > 1) {
             setCompletedSteps((prev) => prev.filter((step) => step !== currentStep - 1)); // Remove the previous step from completed
             setCurrentStep(currentStep - 1); // Move to the previous step
@@ -323,6 +325,7 @@ const ACAdmission = () => {
                 dispatch(resetBankDetails());
                 dispatch(resetAcademicData());
                 dispatch(resetFeeStructure());
+                dispatch(resetDocumentUpload());
             }
 
         } catch (error) {
@@ -357,6 +360,10 @@ const ACAdmission = () => {
     const stateEducationDetailsInter = useSelector((state) => state.educationalDetails.inter);
     const stateSubjectData = useSelector((state) => state.subjectDetails);
     const stateBankData = useSelector((state) => state.bankDetails);
+    const stateFeeData = useSelector((state) => state.feeStructure);
+    const stateDocumenyUploadData = useSelector((state) => state.documentUpload);
+
+
 
     // const stateStudentData = useSelector((state) => state.userInfo.studentData);
     const isFemale = stateStudentData?.gander === "Female";
@@ -406,7 +413,7 @@ const ACAdmission = () => {
             });
 
             if (result.canceled === false) {
-                console.log('File picked:', result);
+                // console.log('File picked:', result);
 
                 // Set file size limit to 200 KB
                 const sizeLimit = 200 * 1024; // 200 KB in bytes
@@ -485,7 +492,7 @@ const ACAdmission = () => {
             Alert.alert("Error", "An error occurred while picking the image.");
         }
     };
-    console.log("items", items)
+    // console.log("stateDocumenyUploadData", stateDocumenyUploadData)
     return (
         loading ? <Loader /> :
             <View style={styles.container}>
@@ -508,6 +515,7 @@ const ACAdmission = () => {
                             padding: 20,
                             alignItems: 'center',
                         }}>
+                            <TouchableOpacity onPress={() => router.back()} style={styles.closeIcon}><AntDesign name="closecircleo" size={28} color="black" /></TouchableOpacity>
                             <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' }}>
                                 Welcome To The SRPB Admission Form
                             </Text>
@@ -584,9 +592,9 @@ const ACAdmission = () => {
                 </View>
 
                 <View style={styles.stepNavigation}>
-                    <Text style={styles.stepLabel}>Step {currentStep} of {totalSteps}</Text>
+                    <Text style={styles.stepLabel}>Step {currentStep} of {totalSteps-1}</Text>
                     <View style={styles.progressBar}>
-                        {[...Array(totalSteps)].map((_, index) => {
+                        {[...Array(totalSteps-1)].map((_, index) => {
                             const stepNumber = index + 1;
                             return (
                                 <View
@@ -1267,7 +1275,7 @@ const ACAdmission = () => {
 
                                     <View style={{ justifyContent: 'flex-end', flexDirection: 'row', marginBottom: 20 }}>
 
-                                        <View style={{ width: '45%' }}>
+                                        <View style={{ width: '48%' }}>
                                             <CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={'Submit & Next'} onClick={handleSubmit} />
                                         </View>
 
@@ -1766,10 +1774,10 @@ const ACAdmission = () => {
 
 
                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginBottom: 30 }}>
-                                        <View style={{ width: '45%' }}>
+                                        <View style={{ width: '48%' }}>
                                             <CustomButton buttonStyle={styles.buttonStyleBack} buttonStyleText={styles.buttonStyleTextBack} children={'Back'} onClick={handlePreviousStep} />
                                         </View>
-                                        <View style={{ width: '45%' }}>
+                                        <View style={{ width: '48%' }}>
                                             <CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={'Submit & Next'} onClick={handleSubmit} />
                                         </View>
 
@@ -2100,10 +2108,10 @@ const ACAdmission = () => {
 
 
                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginBottom: 30 }}>
-                                        <View style={{ width: '45%' }}>
+                                        <View style={{ width: '48%' }}>
                                             <CustomButton buttonStyle={styles.buttonStyleBack} buttonStyleText={styles.buttonStyleTextBack} children={'Back'} onClick={handlePreviousStep} />
                                         </View>
-                                        <View style={{ width: '45%' }}>
+                                        <View style={{ width: '48%' }}>
                                             <CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={'Submit & Next'} onClick={handleSubmit} />
                                         </View>
 
@@ -2155,6 +2163,7 @@ const ACAdmission = () => {
                                         {touched.bankName && errors.bankName && (
                                             <Text style={{ color: 'red' }}>{errors.bankName}</Text>
                                         )}
+                                        
                                     </View>
 
                                     <View style={styles.inputView}>
@@ -2236,10 +2245,10 @@ const ACAdmission = () => {
 
 
                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginBottom: 30 }}>
-                                        <View style={{ width: '45%' }}>
+                                        <View style={{ width: '48%' }}>
                                             <CustomButton buttonStyle={styles.buttonStyleBack} buttonStyleText={styles.buttonStyleTextBack} children={'Back'} onClick={handlePreviousStep} />
                                         </View>
-                                        <View style={{ width: '45%' }}>
+                                        <View style={{ width: '48%' }}>
                                             <CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={'Submit & Next'} onClick={handleSubmit} />
                                         </View>
 
@@ -2255,6 +2264,8 @@ const ACAdmission = () => {
 
 
                     {currentStep === 5 && (
+
+
                         <Formik
                             initialValues={initialValues}
 
@@ -2305,10 +2316,10 @@ const ACAdmission = () => {
                                     ))}
 
                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginBottom: 30 }}>
-                                        <View style={{ width: '45%' }}>
+                                        <View style={{ width: '48%' }}>
                                             <CustomButton buttonStyle={styles.buttonStyleBack} buttonStyleText={styles.buttonStyleTextBack} children={'Back'} onClick={handlePreviousStep} />
                                         </View>
-                                        <View style={{ width: '45%' }}>
+                                        <View style={{ width: '48%' }}>
                                             <CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={'Submit & Next'} onClick={handleSubmit} />
                                         </View>
 
@@ -2320,34 +2331,38 @@ const ACAdmission = () => {
                                 </View>
                             )}
                         </Formik>
+
+
                     )}
 
                     {currentStep === 6 && (
                         <Formik
                             initialValues={{
-                                matricResult: '',
-                                matricProvisional: '',
-                                interResult: '',
-                                interProvisional: '',
-                                interAdmitCard: '',
-                                interRegistrationCard: '',
-                                aadharCard: '',
-                                fatherAadharCard: '',
-                                motherAadharCard: '',
-                                casteCard: '',
-                                incomeCard: '',
-                                residenceCard: '',
-                                photo: '',
-                                CLC: '',
-                                TC: '',
-                                migration: '',
-                                univCard: '',
-                                univRankCard: '',
-                                singnecher:''
+                                matricResult: stateDocumenyUploadData.matricResult || '',
+                                matricProvisional: stateDocumenyUploadData.matricProvisional || '',
+                                interResult: stateDocumenyUploadData.interResult || '',
+                                interProvisional:stateDocumenyUploadData.interProvisional || '',
+                                interAdmitCard: stateDocumenyUploadData.interAdmitCard || '',
+                                interRegistrationCard: stateDocumenyUploadData.interRegistrationCard ||'',
+                                aadharCard: stateDocumenyUploadData.aadharCard || '',
+                                fatherAadharCard: stateDocumenyUploadData.fatherAadharCard || '',
+                                motherAadharCard: stateDocumenyUploadData.motherAadharCard || '',
+                                casteCard: stateDocumenyUploadData.casteCard || '',
+                                incomeCard: stateDocumenyUploadData.incomeCard,
+                                residenceCard: stateDocumenyUploadData.residenceCard,
+                                photo: stateDocumenyUploadData.photo || '',
+                                CLC: stateDocumenyUploadData.CLC || '',
+                                TC: stateDocumenyUploadData.TC || '',
+                                migration: stateDocumenyUploadData.migration || '',
+                                univCard: stateDocumenyUploadData.univCard || '',
+                                univRankCard: stateDocumenyUploadData.univRankCard || '',
+                                signature: stateDocumenyUploadData.signature || ''
                             }}
                             validationSchema={validationSchemaUpload}
                             onSubmit={(values) => {
-                                console.log('Form values:', values);
+                                console.log('Form values: 6', values);
+                                dispatch(saveDocumentUpload(values));
+                                handleNextStep();
                                 // Navigate to Success Payment Page
                                 // router.push('/screens/SuccessPaymentPage/');
                             }}
@@ -2355,8 +2370,8 @@ const ACAdmission = () => {
                             {({ handleSubmit, setFieldValue, errors, touched, values }) => (
                                 <View style={{ paddingLeft: 4, paddingRight: 4, paddingTop: 30 }} >
                                     <Text style={styles.header}>Upload Documants</Text>
-                                    <Text style={[styles.error,{textAlign:'center'}]}>All PDF files are uploaed max size limit 200KB</Text>
-                                    <Text style={[styles.error,{textAlign:'center'}]}>All Image files are uploaed between 20KB to 50KB</Text>
+                                    <Text style={[styles.error, { textAlign: 'center' }]}>All PDF files are uploaed max size limit 200KB</Text>
+                                    <Text style={[styles.error, { textAlign: 'center' }]}>All Image files are uploaed between 20KB to 50KB</Text>
 
                                     {/* Form Fields */}
                                     {Object.keys(validationSchemaUpload.fields).map((fieldName, index) => {
@@ -2365,11 +2380,11 @@ const ACAdmission = () => {
                                         return (
                                             <View key={index}>
                                                 <Text style={[styles.label, { marginBottom: 5 }]}>
-                                                    {fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} {fieldName == "photo" || fieldName=="singnecher" ? "Image" : "Pdf "}<Text style={styles.badge}>*</Text>
+                                                    {fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} {fieldName == "photo" || fieldName == "signature" ? "Image" : "Pdf "}<Text style={styles.badge}>*</Text>
 
                                                 </Text>
                                                 {/* {console.log("fieldName",fieldName)} */}
-                                                <TouchableOpacity style={styles.fileUploadView} onPress={fieldName == "photo" || fieldName=="singnecher" ? () => pickImage(setFieldValue, fieldName) : () => pickDocument(setFieldValue, fieldName)}>
+                                                <TouchableOpacity style={styles.fileUploadView} onPress={fieldName == "photo" || fieldName == "signature" ? () => pickImage(setFieldValue, fieldName) : () => pickDocument(setFieldValue, fieldName)}>
                                                     <View style={styles.ImageSection}>
                                                         <Image
                                                             source={require("../../../assets/images/Add-files-cuate.png")}
@@ -2377,7 +2392,8 @@ const ACAdmission = () => {
                                                             resizeMode="contain"
                                                         />
                                                     </View>
-                                                    <Text style={styles.textStyles}>
+                                                    <Text style={[styles.textStyles,
+                                                    matchedItem && matchedItem.name && { color: '#000' }]}>
                                                         {matchedItem && matchedItem.name && matchedItem.name}
                                                         {!matchedItem && "Click & Upload"}
                                                     </Text>
@@ -2394,20 +2410,20 @@ const ACAdmission = () => {
                                                             resizeMode='stretch'
                                                             style={{ width: '100%', height: '100%' }}
                                                         />
-                                                 </View>
+                                                    </View>
                                                 )}
 
-{fieldName == "singnecher" && values[fieldName] && (
+                                                {fieldName == "signature" && values[fieldName] && (
 
 
-<View style={{ width: 100, height: 100, justifyContent: 'center', alignItems: 'center' }}>
-    <Image
-        source={{ uri: values[fieldName] }}
-        resizeMode='stretch'
-        style={{ width: '100%', height: '100%' }}
-    />
-</View>
-)}
+                                                    <View style={{ width: 100, height: 100, justifyContent: 'center', alignItems: 'center' }}>
+                                                        <Image
+                                                            source={{ uri: values[fieldName] }}
+                                                            resizeMode='stretch'
+                                                            style={{ width: '100%', height: '100%' }}
+                                                        />
+                                                    </View>
+                                                )}
 
                                                 {/* {matchedItem && matchedItem.name && <Text>{matchedItem.name}</Text>} */}
                                             </View>
@@ -2417,10 +2433,10 @@ const ACAdmission = () => {
 
                                     {/* Buttons */}
                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginBottom: 30 }}>
-                                        <View style={{ width: '45%' }}>
+                                        <View style={{ width: '48%' }}>
                                             <CustomButton buttonStyle={styles.buttonStyleBack} buttonStyleText={styles.buttonStyleTextBack} children={'Back'} onClick={handlePreviousStep} />
                                         </View>
-                                        <View style={{ width: '45%' }}>
+                                        <View style={{ width: '48%' }}>
                                             <CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={'Submit & Next'} onClick={handleSubmit} />
                                         </View>
                                     </View>
@@ -2429,7 +2445,87 @@ const ACAdmission = () => {
                         </Formik>
                     )}
 
+                    {currentStep === 7 && (
+                      
+                        <Formik
+                            initialValues={initialValues}
 
+
+                            onSubmit={(values) => {
+                                const totalFee=values.total
+                                console.log("totalFee",totalFee)
+                                console.log("stateStudentData",stateStudentData)
+                            console.log("stateEducationDetailsMatic",stateEducationDetailsMatic)
+                            console.log("stateEducationDetailsInter",stateEducationDetailsInter)
+                            console.log("stateSubjectData",stateSubjectData)
+                            console.log("stateBankData",stateBankData)
+                            console.log("stateFeeData",stateFeeData)
+                            console.log("stateDocumenyUploadData",stateDocumenyUploadData)
+
+                                // dispatch(saveFeeStructure(values));
+                                // console.log('Step 4 Values:', values);
+                                // handleNextStep();
+                                // alert('Form submitted!');
+                            }}
+                        >
+                            {({ setFieldValue, handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+                                <View>
+                                       
+
+                               <Text style={[styles.header,{color:'red'}]}>Please Check All The previous Fields Before You Submit</Text>
+
+                
+                                    <Text style={styles.header}>Fee Structure</Text>
+                                   
+
+
+
+                                    {Object.keys(initialValues).map((key) => (
+                                        <View style={styles.inputView} key={key}>
+                                            {/* {console.log(key,values[key])} */}
+                                            <CustomInput
+                                                title={key.replace(/([A-Z])/g, ' $1') // Split camelCase or PascalCase
+                                                    .trim() // Remove any leading/trailing spaces
+                                                    .replace(/\b\w/g, char => char.toUpperCase())}
+                                                required={true}
+                                                onChangeText={handleChange(key)}
+                                                onBlur={handleBlur(key)}
+                                                values={String(values[key])} // Correct prop name for the current value
+                                                placeholder={`Enter ${key}`}
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                                editable={false}
+                                            />
+                                        </View>
+                                    ))}
+
+{stateFeeData.total == 0 &&(<Text style={[styles.header,{marginTop:10,marginBottom:5}]}>You Are Eligible For Free Admission.</Text>)}
+
+                                    <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginBottom: 30 }}>
+                                        <View style={{ width: '48%' }}>
+                                            <CustomButton buttonStyle={styles.buttonStyleBack} buttonStyleText={styles.buttonStyleTextBack} children={'Back'} onClick={handlePreviousStep} />
+                                        </View>
+                                        <View style={{ width: '48%' }}>
+                                            <CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={stateFeeData.total == 0 ? 'Submit' : `₹${stateFeeData.total} Pay`} onClick={handleSubmit} />
+                                        </View>
+
+                                    </View>
+
+
+
+                                    {/* <Button title="Submit" onPress={handleSubmit} /> */}
+                                </View>
+                            )}
+                        </Formik>
+
+
+
+
+
+
+                    )}
 
                     {/* Step Navigation Buttons */}
                     {/* <View style={styles.buttonContainer}>
