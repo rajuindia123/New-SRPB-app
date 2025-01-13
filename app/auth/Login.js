@@ -119,6 +119,7 @@ const Login = () => {
                                     });
     
                                     await AsyncStorage.setItem("userLoggedIn", userLoggedIn);
+                                    await AsyncStorage.setItem("studentUAN", trimmedValues.stuUAN);
                                     // await AsyncStorage.setItem("stuLoggedIn", "true");
                                     setToastConfig({
                                         visible: true,

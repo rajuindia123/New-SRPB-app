@@ -18,7 +18,6 @@ const subjectDetailsSlice = createSlice({
       // Update the bank details
       Object.assign(state, action.payload);
     },
-    
     resetsubjectDetails: (state) => {
       // Reset to initial state
       Object.assign(state, initialState);

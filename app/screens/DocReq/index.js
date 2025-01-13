@@ -6,20 +6,20 @@ import { router } from 'expo-router';
 
 // Sample data for the list
 const data = [
-    "Matric Result &Provisional Certificate",
-    "Inter Result & Provisional Cert",
-    "Inter Admit Card",
-    "Inter Registration Card",
-    "Aadhar Card",
-    "Mother`s Aadhar Card",
-    "Father`s Aadhar Card",
-    "Caste, Income & Residence Cert",
-    "Passport Size Color Photo 02 with name & D.O.B",
-    "Original CLC/T.C. & Migration",
-    "Univ. Apply/Rank Card",
-    "Declaration Form",
+    "Matric Result & Provisional Certificate PDF",
+    "Inter Result & Provisional Certificate PDF",
+    "Inter Admit Card PDF",
+    "Inter Registration Card PDF",
+    "Aadhar Card PDF",
+    "Mother's Aadhar Card PDF",
+    "Father's Aadhar Card PDF",
+    "Caste, Income & Residence Certificate PDF",
+    "Passport Size Color Photo with Name & D.O.B in Image",
+    "Signature in Image",
+    "Original CLC/T.C. & Migration PDF",
+    "University Apply/Rank Card PDF",
+    "Declaration Form PDF",
 ];
-
 const DocReqScreen = () => {
     const renderItem = ({ item, index }) => (
         <View style={styles.item}>

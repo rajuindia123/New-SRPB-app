@@ -35,8 +35,8 @@ const CategorySelectListUpdate = ({
         save="key"  // Save the 'key' (this is the key to be selected)
         defaultOption={selectedOption ? { key: selectedOption.key, value: selectedOption.value } : undefined}  // Set the default option based on selectedValue
         search={search} // Enable/disable search functionality
-        boxStyles={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 5 }}
-        dropdownStyles={{ borderWidth: 1, borderColor: '#ccc' }}
+        boxStyles={{ borderWidth: 1, borderColor: '#690405', borderRadius: 5 }}
+        dropdownStyles={{ borderWidth: 1, borderColor: '#690405' }}
       />
     </View>
   );

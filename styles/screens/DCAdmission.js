@@ -313,6 +313,7 @@ width:160,
         fontSize: 14,
         fontFamily: FontFamiles.PTSerifRegular,
         color: "#000",
+        marginTop:8
       },
       info:{
         marginTop:10,
@@ -386,6 +387,55 @@ fontFamily:FontFamiles.PTSerifBold
         marginTop: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',
+      },
+      TextAliment: {
+        textAlign: 'center',
+        fontSize: 18,
+        fontFamily: FontFamiles.PTSerifBold,
+        textDecorationLine: 'underline',
+        color: Colors.Red,
+        // marginTop:10,
+      },
+      fileUploadView: {
+        padding: 10,
+        // marginTop:20,
+        width: '100%',
+        height: 'auto',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        elevation: 5,
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        marginBottom: 10,
+        // borderColor:Colors.primary,
+        // borderWidth:1,
+      },
+      ImageSection: {
+    
+        width: "30%",
+        height: 30,
+        borderWidth: 1,
+        borderColor: 'green',
+        borderTopLeftRadius: 10,
+        borderBottomLeftRadius: 10,
+        // backgroundColor:'red'
+      },
+      logo: {
+        width: '100%',
+        height: '100%'
+      },
+      textStyles: {
+        padding: 5,
+        height: '100%',
+        textAlign: 'center',
+        fontFamily: FontFamiles.PTSerifBold,
+        fontSize: 11,
+        justifyContent: 'center',
+        alignContent: 'center',
+        alignItems: 'center',
+        width: '70%',
+        // paddingTop:20,
+        color: 'blue'
       },
 
 

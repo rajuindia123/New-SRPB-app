@@ -1,29 +1,32 @@
-import { View, Text, ScrollView, Image, Modal, TouchableOpacity, BackHandler, TextInput, Button } from 'react-native';
+import { View, Text, ScrollView, Image, Modal, TouchableOpacity, BackHandler, TextInput, Button, Alert } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import { styles } from '../../../styles/screens/DCAdmission';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Divider, RadioButton } from 'react-native-paper';
 import CategorySelectList from '../../components/CategorySelectList';
+import CategorySelectListUpdate from '../../components/CategorySelectListUpdate';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 import { router } from 'expo-router';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { ProgressSteps, ProgressStep } from 'react-native-progress-steps';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Entypo from '@expo/vector-icons/Entypo';// Validation schemas for each step
 // import RadioButton from 'react-native-paper';
 import { districtData, SubjectOfferedData } from '../../../src/data';
-
 import { getDocumentsById } from '../../Function/AppwriteCollection';
 import { EnrollmentStudentsCollectionId } from '../../../src/appwriteAllid';
 import Loader from '../../components/Loader';
-import { updateFormData, } from '../../redux/features/userInfoSlice';
-import { updateInterData,updateMatricData } from '../../redux/features/educationalDetailsSlice';
-import { saveBankDetails } from '../../redux/features/bankDetailsSlice';
-import { savesubjectDetails } from '../../redux/features/subjectDetailsSlice';
-import { useDispatch } from 'react-redux';
+import { updateFormData, resetFormData } from '../../redux/features/userInfoSlice';
+import { updateInterData, updateMatricData, resetAcademicData } from '../../redux/features/educationalDetailsSlice';
+import { saveBankDetails, resetBankDetails } from '../../redux/features/bankDetailsSlice';
+import { savesubjectDetails, resetsubjectDetails } from '../../redux/features/subjectDetailsSlice';
+import { saveFeeStructure, resetFeeStructure } from '../../redux/features/feeStructureSlice';
+import { useDispatch, } from 'react-redux';
 import { useSelector } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 const step1ValidationSchema = Yup.object().shape({
     candidateName: Yup.string().required('Full Name is required'),
@@ -103,6 +106,41 @@ const step4ValidationSchema = Yup.object().shape({
 
 });
 
+const validationSchemaUpload = Yup.object().shape({
+    matricResult: Yup.string().required('Matric Result Certificate is required'),
+    matricProvisional: Yup.string().required('Matric Provisional Certificate is required'),
+    interResult: Yup.string().required('Inter Result Certificate is required'),
+    interProvisional: Yup.string().required('Inter Provisional Certificate is required'),
+    interAdmitCard: Yup.string().required('Inter Admit Card is required'),
+    interRegistrationCard: Yup.string().required('Inter Registration Card is required'),
+    aadharCard: Yup.string().required('Student Aadhar Card is required'),
+    fatherAadharCard: Yup.string().required('Father\'s Aadhar Card is required'),
+    motherAadharCard: Yup.string().required('Mother\'s Aadhar Card is required'),
+    casteCard: Yup.string().required('Caste Certificate is required'),
+    incomeCard: Yup.string().required('Income Certificate is required'),
+    residenceCard: Yup.string().required('Residence Certificate is required'),
+
+    CLC: Yup.string().required('Original CLC is required'),
+    TC: Yup.string().required('Original T.C. is required'),
+    migration: Yup.string().required('Original Migration is required'),
+    univCard: Yup.string().required('University Apply Card is required'),
+    univRankCard: Yup.string().required('University Rank Card is required'),
+    photo: Yup.string().required('Passport Size Photo is required'),
+    singnecher: Yup.string().required('Singnecher Photo is required'),
+
+});
+
+
+const feeStructure = {
+    I: { admissionFee: 350, tuitionFee: 600, culturalTarang: 25, library: 200, electricityFee: 200, identityCard: 100, nssFee: 50, buildingMaintainsFund: 100, medicalFee: 100, athleticsFund: 100, commonRoomFund: 50, coCurricularFee: 50, environmentalProtectionFee: 50, studentWelfareFee: 30, studentUnionFee: 100, societySubscription: 50, magazineFund: 50, handbook: 50, practical: 600, total: 2855 },
+    II: { admissionFee: 250, tuitionFee: 600, culturalTarang: 25, library: 200, electricityFee: 200, identityCard: 0, nssFee: 50, buildingMaintainsFund: 100, medicalFee: 100, athleticsFund: 100, commonRoomFund: 50, coCurricularFee: 50, environmentalProtectionFee: 50, studentWelfareFee: 30, studentUnionFee: 100, societySubscription: 50, magazineFund: 50, handbook: 0, practical: 600, total: 2605 },
+    III: { admissionFee: 250, tuitionFee: 600, culturalTarang: 25, library: 200, electricityFee: 200, identityCard: 0, nssFee: 50, buildingMaintainsFund: 100, medicalFee: 100, athleticsFund: 100, commonRoomFund: 50, coCurricularFee: 50, environmentalProtectionFee: 50, studentWelfareFee: 30, studentUnionFee: 100, societySubscription: 50, magazineFund: 50, handbook: 0, practical: 0, total: 2005 },
+    IV: { admissionFee: 250, tuitionFee: 600, culturalTarang: 25, library: 200, electricityFee: 200, identityCard: 0, nssFee: 50, buildingMaintainsFund: 100, medicalFee: 100, athleticsFund: 100, commonRoomFund: 50, coCurricularFee: 50, environmentalProtectionFee: 50, studentWelfareFee: 30, studentUnionFee: 100, societySubscription: 50, magazineFund: 50, handbook: 0, practical: 0, total: 2005 },
+    V: { admissionFee: 250, tuitionFee: 600, culturalTarang: 25, library: 200, electricityFee: 200, identityCard: 0, nssFee: 50, buildingMaintainsFund: 100, medicalFee: 100, athleticsFund: 100, commonRoomFund: 50, coCurricularFee: 50, environmentalProtectionFee: 50, studentWelfareFee: 30, studentUnionFee: 100, societySubscription: 50, magazineFund: 50, handbook: 0, practical: 0, total: 2005 },
+    VI: { admissionFee: 250, tuitionFee: 600, culturalTarang: 25, library: 200, electricityFee: 200, identityCard: 0, nssFee: 50, buildingMaintainsFund: 100, medicalFee: 100, athleticsFund: 100, commonRoomFund: 50, coCurricularFee: 50, environmentalProtectionFee: 50, studentWelfareFee: 30, studentUnionFee: 100, societySubscription: 50, magazineFund: 50, handbook: 0, practical: 0, total: 2005 },
+    VII: { admissionFee: 250, tuitionFee: 600, culturalTarang: 25, library: 200, electricityFee: 200, identityCard: 0, nssFee: 50, buildingMaintainsFund: 100, medicalFee: 100, athleticsFund: 100, commonRoomFund: 50, coCurricularFee: 50, environmentalProtectionFee: 50, studentWelfareFee: 30, studentUnionFee: 100, societySubscription: 50, magazineFund: 50, handbook: 0, practical: 0, total: 2005 },
+};
+
 const data = [
     { key: '1', value: 'I' },
     { key: '2', value: 'II' },
@@ -172,12 +210,14 @@ const ACAdmission = () => {
     const [interInstitutionDistricts, seInterInstitutionDistricts] = useState([]);
     const [subject, setSubject] = useState([]);
     const [mdcSubject, setMdcSubject] = useState([]);
-    const totalSteps = 5;
+    const totalSteps = 7;
     const [section, setSection] = useState("-")
     const [studentData, setStudentData] = useState(null)
     const [search, onSearchText] = React.useState('');
     const [loading, setLoading] = useState(false);
-
+    const [image, setImage] = useState(null);
+    const [items, setItems] = useState([]);
+    // const[studentUAN,setStudentUAN]=useState()
     const parts = section.split("-");
 
 
@@ -278,7 +318,11 @@ const ACAdmission = () => {
                 setSection(result[0].stuSession)
                 onSearchText(result[0].stuUAN)
                 setIsModalVisible(false);
-
+                dispatch(resetFormData());
+                dispatch(resetsubjectDetails());
+                dispatch(resetBankDetails());
+                dispatch(resetAcademicData());
+                dispatch(resetFeeStructure());
             }
 
         } catch (error) {
@@ -298,10 +342,150 @@ const ACAdmission = () => {
     };
 
     useEffect(() => {
+        const checkLoginStatus = async () => {
+
+            const stuUAN = await AsyncStorage.getItem("studentUAN");
+            if (stuUAN) {
+                onSearchText(stuUAN)
+            }
+        };
+        checkLoginStatus();
         // Optional: Add logic if needed when the modal is shown/closed
     }, []);
-    const studentData1 = useSelector((state) => state.userInfo.studentData);
-console.log(studentData1)
+    const stateStudentData = useSelector((state) => state.userInfo.studentData);
+    const stateEducationDetailsMatic = useSelector((state) => state.educationalDetails.matric);
+    const stateEducationDetailsInter = useSelector((state) => state.educationalDetails.inter);
+    const stateSubjectData = useSelector((state) => state.subjectDetails);
+    const stateBankData = useSelector((state) => state.bankDetails);
+
+    // const stateStudentData = useSelector((state) => state.userInfo.studentData);
+    const isFemale = stateStudentData?.gander === "Female";
+    // console.log("isFemale",stateStudentData?.gander)
+    const isMaleSCorST = stateStudentData?.gander === "Male" &&
+        (stateStudentData?.stuCategory === "SC" || stateStudentData?.stuCategory === "ST");
+
+    const initialValues = {
+        admissionFee: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.admissionFee || 0,
+        tuitionFee: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.tuitionFee || 0,
+        culturalTarang: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.culturalTarang || 0,
+        library: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.library || 0,
+        electricityFee: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.electricityFee || 0,
+        identityCard: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.identityCard || 0,
+        nssFee: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.nssFee || 0,
+        buildingMaintainsFund: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.buildingMaintainsFund || 0,
+        medicalFee: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.medicalFee || 0,
+        athleticsFund: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.athleticsFund || 0,
+        commonRoomFund: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.commonRoomFund || 0,
+        coCurricularFee: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.coCurricularFee || 0,
+        environmentalProtectionFee: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.environmentalProtectionFee || 0,
+        studentWelfareFee: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.studentWelfareFee || 0,
+        studentUnionFee: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.studentUnionFee || 0,
+        societySubscription: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.societySubscription || 0,
+        magazineFund: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.magazineFund || 0,
+        handbook: isFemale || isMaleSCorST ? 0 : feeStructure[stateSubjectData?.semester]?.handbook || 0,
+        practical: isFemale || isMaleSCorST ? 0 : (
+            stateSubjectData?.stream === "Science" ||
+            (stateSubjectData?.stream === "Arts" &&
+                ["Philosophy", "Home Science", "Geography"].includes(stateSubjectData?.majorPaper))
+        ) ? 600 : 0,
+    };
+
+    // Calculate total fee
+    initialValues.total = Object.values(initialValues).reduce((sum, value) => sum + (typeof value === 'number' ? value : 0), 0);
+
+    // console.log("admissionFee123",studentData)
+    // console.log(search)
+
+
+
+    const pickDocument = async (setFieldValue, fieldName) => {
+        try {
+            const result = await DocumentPicker.getDocumentAsync({
+                type: 'application/pdf', // Restrict to PDF files
+                copyToCacheDirectory: true,
+            });
+
+            if (result.canceled === false) {
+                console.log('File picked:', result);
+
+                // Set file size limit to 200 KB
+                const sizeLimit = 200 * 1024; // 200 KB in bytes
+                if (result.assets[0].size > sizeLimit) {
+                    Alert.alert(
+                        "File Too Large",
+                        `The selected file is too large. Please select a file smaller than ${sizeLimit / 1024} KB.`
+                    );
+                    return; // Stop further processing
+                }
+
+                const newItem = { id: items.length + 1, name: result.assets[0].name, fieldName: fieldName };
+                setFieldValue(fieldName, result.assets[0].uri);
+                setItems((prevItems) => {
+                    // Remove any existing item with the same fieldName
+                    const filteredItems = prevItems.filter(item => item.fieldName !== fieldName);
+                    // Add the new item
+                    return [...filteredItems, newItem];
+                });
+            } else {
+                console.log('Document picking canceled');
+            }
+        } catch (error) {
+            console.error('Error picking document:', error);
+            Alert.alert("Error", "An error occurred while picking the document.");
+        }
+    };
+
+    const pickImage = async (setFieldValue, fieldName) => {
+        try {
+            let result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: false,
+                aspect: [4, 3],
+                quality: 1,
+            });
+
+            console.log(result);
+
+            if (!result.canceled) {
+                const uri = result.assets[0].uri;
+
+                // Get file info to check the size
+                const fileInfo = await FileSystem.getInfoAsync(uri);
+                const fileSize = fileInfo.size;
+
+                // Set size limits (20 KB to 50 KB)
+                const minSizeLimit = 20 * 1024; // 20 KB in bytes
+                const maxSizeLimit = 50 * 1024; // 50 KB in bytes
+
+                if (fileSize < minSizeLimit || fileSize > maxSizeLimit) {
+                    Alert.alert(
+                        "Invalid File Size",
+                        `Please select an image between ${minSizeLimit / 1024} KB and ${maxSizeLimit / 1024} KB.`
+                    );
+                    return; // Stop further processing
+                }
+
+                const newItem = {
+                    id: items.length + 1,
+                    name: uri.split('/').pop(), // Extract file name from URI
+                    fieldName: fieldName
+                };
+
+                setImage(uri);
+                setFieldValue(fieldName, uri);
+                setItems((prevItems) => {
+                    // Remove any existing item with the same fieldName
+                    const filteredItems = prevItems.filter(item => item.fieldName !== fieldName);
+                    // Add the new item
+                    return [...filteredItems, newItem];
+                });
+            }
+        } catch (error) {
+            console.error('Error picking image:', error);
+            Alert.alert("Error", "An error occurred while picking the image.");
+        }
+    };
+    console.log("items", items)
     return (
         loading ? <Loader /> :
             <View style={styles.container}>
@@ -337,9 +521,8 @@ console.log(studentData1)
                                     required={true}
                                     onChangeText={(text) => { onSearchText(text), setError("") }}
                                     // onChangeText={onSearchText}
-                                    value={search}
-
-
+                                    values={search}
+                                    editable={false}
                                     placeholder="Enter Student UAN No."
                                     labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
                                     keyboardType={'default'}
@@ -442,59 +625,59 @@ console.log(studentData1)
                                 motherName: studentData?.stuMotherName || '',
                                 fatherName: studentData?.stuFatherName || '',
                                 gander: studentData?.stuGender || '',
-                                emailId: '',
-                                whatsappNo: '',
-                                mobNo: '',
-                                stuAadharNo: '',
-                                motherAadhar: '',
-                                motherOccupation: '',
-                                fatherAadhar: '',
-                                fatherMobNo: '',
-                                fatherOccupation: '',
-                                motherMobNo: '',
-                                religion: '',
-                                identiMark: '',
-                                bloodGroup: '',
-                                corAddress: '',
-                                perAddress: '',
-                                state: '',
-                                district: '',
-                                maritalStatus: '',
+                                emailId: stateStudentData.emailId || '',
+                                whatsappNo: stateStudentData.whatsappNo || '',
+                                mobNo: stateStudentData.mobNo || '',
+                                stuAadharNo: stateStudentData.stuAadharNo || '',
+                                motherAadhar: stateStudentData.motherAadhar || '',
+                                motherOccupation: stateStudentData.motherOccupation || '',
+                                fatherAadhar: stateStudentData.fatherAadhar || '',
+                                fatherMobNo: stateStudentData.fatherMobNo || '',
+                                fatherOccupation: stateStudentData.fatherOccupation || '',
+                                motherMobNo: stateStudentData.motherMobNo || '',
+                                religion: stateStudentData.religion || '',
+                                identiMark: stateStudentData.identiMark || '',
+                                bloodGroup: stateStudentData.bloodGroup || '',
+                                corAddress: stateStudentData.corAddress || '',
+                                perAddress: stateStudentData.perAddress || '',
+                                state: stateStudentData.state || '',
+                                district: stateStudentData.district || '',
+                                maritalStatus: stateStudentData.maritalStatus || '',
                                 stuCategory: studentData?.stuCategory || ''
 
 
                             }}
                             validationSchema={step1ValidationSchema}
                             onSubmit={(values) => {
-const data={
-    candidateName: values.candidateName,
-    uan: values.uan,
-    motherName: values.motherName,
-    fatherName: values.fatherName,
-    gander: values.gander,
-    emailId: values.emailId,
-    whatsappNo: values.whatsappNo,
-    mobNo: values.mobNo,
-    stuAadharNo: values.stuAadharNo,
-    motherAadhar: values.motherAadhar,
-    motherOccupation: values.motherOccupation,
-    fatherAadhar:values.fatherAadhar,
-    fatherMobNo: values.fatherMobNo,
-    fatherOccupation: values.fatherOccupation,
-    motherMobNo: values.motherMobNo,
-    religion: values.religion,
-    identiMark: values.identiMark,
-    bloodGroup: values.bloodGroup,
-    corAddress: values.corAddress,
-    perAddress: values.perAddress,
-    state: values.state,
-    district: values.district,
-    maritalStatus: values.maritalStatus,
-    stuCategory: values.stuCategory,
-}
+                                const data = {
+                                    candidateName: values.candidateName,
+                                    uan: values.uan,
+                                    motherName: values.motherName,
+                                    fatherName: values.fatherName,
+                                    gander: values.gander,
+                                    emailId: values.emailId,
+                                    whatsappNo: values.whatsappNo,
+                                    mobNo: values.mobNo,
+                                    stuAadharNo: values.stuAadharNo,
+                                    motherAadhar: values.motherAadhar,
+                                    motherOccupation: values.motherOccupation,
+                                    fatherAadhar: values.fatherAadhar,
+                                    fatherMobNo: values.fatherMobNo,
+                                    fatherOccupation: values.fatherOccupation,
+                                    motherMobNo: values.motherMobNo,
+                                    religion: values.religion,
+                                    identiMark: values.identiMark,
+                                    bloodGroup: values.bloodGroup,
+                                    corAddress: values.corAddress,
+                                    perAddress: values.perAddress,
+                                    state: values.state,
+                                    district: values.district,
+                                    maritalStatus: values.maritalStatus,
+                                    stuCategory: values.stuCategory,
+                                }
 
 
-dispatch(updateFormData(data));
+                                dispatch(updateFormData(data));
 
 
 
@@ -617,6 +800,7 @@ dispatch(updateFormData(data));
                                         Student Gender.<Text style={styles.badge}>*</Text>
 
                                     </Text>
+                                    {/* {console.log("values.gander",values.gander)} */}
                                     <RadioButton.Group
                                         // onValueChange={(val) => setFieldValue('gander', val)}
                                         value={values.gander}
@@ -893,7 +1077,24 @@ dispatch(updateFormData(data));
 
                                     </View>
 
-                                    <CategorySelectList
+
+
+                                    <CategorySelectListUpdate
+                                        label="Select Religion"
+                                        data={ReligionData}
+                                        selectedValue={values.religion}
+                                        onSelect={(val) => setFieldValue('religion', val)}
+                                        search={false}
+                                        required={true}
+                                    />
+
+
+
+
+
+
+
+                                    {/* <CategorySelectList
                                         label="Select Religion"
                                         data={ReligionData}
                                         selectedValue={values.religion}
@@ -903,7 +1104,10 @@ dispatch(updateFormData(data));
                                     />
                                     {touched.religion && errors.religion && (
                                         <Text style={{ color: 'red' }}>{errors.religion}</Text>
-                                    )}
+                                    )} */}
+
+
+
 
 
                                     <View style={styles.inputView}>
@@ -928,7 +1132,7 @@ dispatch(updateFormData(data));
                                         )}
 
                                     </View>
-                                    <CategorySelectList
+                                    <CategorySelectListUpdate
                                         label="Select Blood Group"
                                         data={BloodGroupData}
                                         selectedValue={values.bloodGroup}
@@ -942,10 +1146,10 @@ dispatch(updateFormData(data));
 
 
 
-                                    <CategorySelectList
+                                    <CategorySelectListUpdate
                                         label="Select Marital Status"
                                         data={MaritalStatusData}
-                                        selectedValue={values.religion}
+                                        selectedValue={values.maritalStatus}
                                         onSelect={(val) => setFieldValue('maritalStatus', val)}
                                         search={false}
                                         required={true}
@@ -955,22 +1159,28 @@ dispatch(updateFormData(data));
                                     )}
 
 
-                                    <Text style={[styles.labelsStyle, { marginTop: 10 }]}>
+                                    {/* <Text style={[styles.labelsStyle, { marginTop: 10 }]}>
                                         Correspondence Full Address:At.<Text style={styles.badge}>*</Text>
 
-                                    </Text>
+                                    </Text> */}
 
                                     <View style={styles.inputView}>
-
-                                        <TextInput
-                                            style={styles.textarea}
-                                            multiline={true}
-                                            numberOfLines={4}
-                                            placeholder="Enter Correspondence Address:At"
+                                        <CustomInput
+                                            title="Correspondence Address:At"
+                                            required={true}
                                             onChangeText={handleChange('corAddress')}
                                             onBlur={handleBlur('corAddress')}
                                             values={values.corAddress}
+                                            placeholder="Enter Correspondence Address:At"
+                                            labelsStyle={styles.labelsStyle}
+                                            inputStyle={styles.textarea}
+                                            keyboardType="default"
+                                            badgeStyles={styles.badge}
+                                            editable={true}
+                                            numberOfLines={4}
                                         />
+
+
                                         {touched.corAddress && errors.corAddress && (
                                             <Text style={{ color: 'red' }}>{errors.corAddress}</Text>
                                         )}
@@ -980,21 +1190,38 @@ dispatch(updateFormData(data));
 
 
 
-                                    <Text style={[styles.labelsStyle, { marginTop: 10 }]}>
-                                        Permanent Full Address:At.<Text style={styles.badge}>*</Text>
 
-                                    </Text>
                                     <View style={styles.inputView}>
 
-                                        <TextInput
-                                            style={styles.textarea}
-                                            multiline={true}
-                                            numberOfLines={4}
-                                            placeholder="Enter Correspondence Address:At"
+                                        <CustomInput
+                                            title="Permanent Address:At"
+                                            required={true}
                                             onChangeText={handleChange('perAddress')}
                                             onBlur={handleBlur('perAddress')}
                                             values={values.perAddress}
+                                            placeholder="Enter Permanent Address:At"
+                                            labelsStyle={styles.labelsStyle}
+                                            inputStyle={styles.textarea}
+                                            keyboardType="default"
+                                            badgeStyles={styles.badge}
+                                            editable={true}
+                                            numberOfLines={4}
                                         />
+
+
+
+
+
+
+                                        {/* <TextInput
+                                            style={styles.textarea}
+                                            multiline={true}
+                                            numberOfLines={4}
+                                            
+                                            onChangeText={handleChange('perAddress')}
+                                            onBlur={handleBlur('perAddress')}
+                                            values={values.perAddress}
+                                        /> */}
                                         {touched.perAddress && errors.perAddress && (
                                             <Text style={{ color: 'red' }}>{errors.perAddress}</Text>
                                         )}
@@ -1005,7 +1232,10 @@ dispatch(updateFormData(data));
 
 
 
-                                    <CategorySelectList
+
+
+
+                                    <CategorySelectListUpdate
                                         label="Select State"
                                         data={districtData.states.map(state => ({ key: state.state, value: state.state }))}
                                         selectedValue={values.state}
@@ -1016,7 +1246,12 @@ dispatch(updateFormData(data));
                                     {touched.state && errors.state && (
                                         <Text style={{ color: 'red' }}>{errors.state}</Text>
                                     )}
-                                    <CategorySelectList
+
+
+
+
+
+                                    <CategorySelectListUpdate
                                         label="Select District"
                                         data={districts.map(district => ({ key: district, value: district }))}
                                         selectedValue={values.district}
@@ -1046,38 +1281,64 @@ dispatch(updateFormData(data));
                     {currentStep === 2 && (
                         <Formik
                             initialValues={{
+                                matricBoardName: stateEducationDetailsMatic.matricBoardName || '',
+                                matricPassingYear: stateEducationDetailsMatic.matricPassingYear || '',
+                                matriRollNo: stateEducationDetailsMatic.matriRollNo || '',
+                                matricRollCode: stateEducationDetailsMatic.matricRollCode || '',
+                                matricMarks: stateEducationDetailsMatic.matricMarks || '',
+                                matricPercentage: stateEducationDetailsMatic.matricPercentage || '',
+                                matricInstitutionCode: stateEducationDetailsMatic.matricInstitutionCode || '',
+                                institutionState: stateEducationDetailsMatic.institutionState || '',
+                                institutionDistrict: stateEducationDetailsMatic.institutionDistrict || '',
 
-
-                                matricBoardName: '',
-                                matricPassingYear: '',
-                                matriRollNo: '',
-                                matricRollCode: '',
-                                matricMarks: '',
-                                matricPercentage: '',
-                                matricInstitutionCode: '',
-                                institutionState: '',
-                                institutionDistrict: '',
-
-                                interBoardName: '',
-                                interPassingYear: '',
-                                interRollNo: '',
-                                interRollCode: '',
-                                interMarks: '',
-                                interPercentage: '',
-                                interInstitutionCode: '',
-                                interCLCNo: '',
-                                interTCNo: '',
-                                interCLCTCIssueDate: '',
-                                interMigrationNo: '',
-                                interMigrationIssueDate: '',
-                                interInstitutionState: '',
-                                interInstitutionDistrict: '',
-
-
+                                interBoardName: stateEducationDetailsInter.interBoardName || '',
+                                interPassingYear: stateEducationDetailsInter.interPassingYear || '',
+                                interRollNo: stateEducationDetailsInter.interRollNo || '',
+                                interRollCode: stateEducationDetailsInter.interRollCode || '',
+                                interMarks: stateEducationDetailsInter.interMarks || '',
+                                interPercentage: stateEducationDetailsInter.interPercentage || '',
+                                interInstitutionCode: stateEducationDetailsInter.interInstitutionCode || '',
+                                interCLCNo: stateEducationDetailsInter.interCLCNo || '',
+                                interTCNo: stateEducationDetailsInter.interTCNo || '',
+                                interCLCTCIssueDate: stateEducationDetailsInter.interCLCTCIssueDate || '',
+                                interMigrationNo: stateEducationDetailsInter.interMigrationNo || '',
+                                interMigrationIssueDate: stateEducationDetailsInter.interMigrationIssueDate || '',
+                                interInstitutionState: stateEducationDetailsInter.interInstitutionState || '',
+                                interInstitutionDistrict: stateEducationDetailsInter.interInstitutionDistrict || '',
                             }}
                             validationSchema={step2ValidationSchema}
                             onSubmit={(values) => {
                                 console.log('Step 2 Values:', values);
+                                const dataMatic = {
+                                    matricBoardName: values.matricBoardName,
+                                    matricPassingYear: values.matricPassingYear,
+                                    matriRollNo: values.matriRollNo,
+                                    matricRollCode: values.matricRollCode,
+                                    matricMarks: values.matricMarks,
+                                    matricPercentage: values.matricPercentage,
+                                    matricInstitutionCode: values.matricInstitutionCode,
+                                    institutionState: values.institutionState,
+                                    institutionDistrict: values.institutionDistrict,
+
+                                }
+                                const dataInter = {
+                                    interBoardName: values.interBoardName,
+                                    interPassingYear: values.interPassingYear,
+                                    interRollNo: values.interRollNo,
+                                    interRollCode: values.interRollCode,
+                                    interMarks: values.interMarks,
+                                    interPercentage: values.interPercentage,
+                                    interInstitutionCode: values.interInstitutionCode,
+                                    interCLCNo: values.interCLCNo,
+                                    interTCNo: values.interTCNo,
+                                    interCLCTCIssueDate: values.interCLCTCIssueDate,
+                                    interMigrationNo: values.interMigrationNo,
+                                    interMigrationIssueDate: values.interMigrationIssueDate,
+                                    interInstitutionState: values.interInstitutionState,
+                                    interInstitutionDistrict: values.interInstitutionDistrict,
+                                }
+                                dispatch(updateMatricData(dataMatic));
+                                dispatch(updateInterData(dataInter));
                                 handleNextStep();
                             }}
                         >
@@ -1222,7 +1483,7 @@ dispatch(updateFormData(data));
 
 
 
-                                    <CategorySelectList
+                                    <CategorySelectListUpdate
                                         label="Select Institution State"
                                         data={districtData.states.map(state => ({ key: state.state, value: state.state }))}
                                         selectedValue={values.institutionState}
@@ -1234,7 +1495,7 @@ dispatch(updateFormData(data));
                                         <Text style={{ color: 'red' }}>{errors.institutionState}</Text>
                                     )}
 
-                                    <CategorySelectList
+                                    <CategorySelectListUpdate
                                         label="Select Institution District"
                                         data={institutionDistricts.map(district => ({ key: district, value: district }))}
                                         selectedValue={values.institutionDistrict}
@@ -1364,7 +1625,7 @@ dispatch(updateFormData(data));
 
 
 
-                                    <CategorySelectList
+                                    <CategorySelectListUpdate
                                         label="Select Institution State"
                                         data={districtData.states.map(state => ({ key: state.state, value: state.state }))}
                                         selectedValue={values.interInstitutionState}
@@ -1376,7 +1637,7 @@ dispatch(updateFormData(data));
                                         <Text style={{ color: 'red' }}>{errors.interInstitutionState}</Text>
                                     )}
 
-                                    <CategorySelectList
+                                    <CategorySelectListUpdate
                                         label="Select Institution District"
                                         data={interInstitutionDistricts.map(district => ({ key: district, value: district }))}
                                         selectedValue={values.interInstitutionDistrict}
@@ -1521,19 +1782,25 @@ dispatch(updateFormData(data));
                     {currentStep === 3 && (
                         <Formik
                             initialValues={{
-                                semester: '',
-                                stream: '',
-                                majorPaper: '',
-                                mdcSubject: '',
-                                micSubject: '',
-                                extraSubject: '',
+                                semester: stateSubjectData.semester || '',
+                                stream: stateSubjectData.stream || '',
+                                majorPaper: stateSubjectData.majorPaper || '',
+                                mdcSubject: stateSubjectData.mdcSubject || '',
+                                micSubject: stateSubjectData.micSubject || '',
+                                extraSubject: stateSubjectData.extraSubject || '',
                                 vacSubject: studentData?.stuVAC || '',
                                 secSubject: studentData?.stuSEC || ''
 
                             }}
                             validationSchema={step3ValidationSchema}
                             onSubmit={(values) => {
+
+
+
+                                dispatch(savesubjectDetails(values));
+
                                 console.log('Step 3 Values:', values);
+
                                 handleNextStep();
                             }}
                         >
@@ -1541,7 +1808,7 @@ dispatch(updateFormData(data));
                                 <View>
                                     <Text style={styles.header}>Subject Details</Text>
 
-                                    <CategorySelectList
+                                    <CategorySelectListUpdate
                                         label="Select Semester"
                                         data={data}
                                         selectedValue={values.semester}
@@ -1553,7 +1820,7 @@ dispatch(updateFormData(data));
                                         <Text style={{ color: 'red' }}>{errors.semester}</Text>
                                     )}
 
-                                    <CategorySelectList
+                                    <CategorySelectListUpdate
                                         label="Select Stream."
                                         data={StreamData}
                                         selectedValue={values.stream}
@@ -1565,7 +1832,7 @@ dispatch(updateFormData(data));
                                         <Text style={{ color: 'red' }}>{errors.stream}</Text>
                                     )}
 
-                                    <CategorySelectList
+                                    <CategorySelectListUpdate
                                         label="Select Major Paper. (MJC)"
 
                                         data={subject.map(data => ({ key: data, value: data }))}
@@ -1586,7 +1853,7 @@ dispatch(updateFormData(data));
 
 
 
-                                    <CategorySelectList
+                                    <CategorySelectListUpdate
                                         label="Select Minor Paper. (MIC)"
 
                                         data={subject.filter(data => data !== values.majorPaper).map(data => ({ key: data, value: data }))}
@@ -1603,7 +1870,7 @@ dispatch(updateFormData(data));
                                     )}
 
 
-                                    <CategorySelectList
+                                    <CategorySelectListUpdate
                                         label="Select Multi Disciplinary Course. (MDC)"
 
                                         data={mdcSubject.map(data => ({ key: data, value: data }))}
@@ -1624,7 +1891,7 @@ dispatch(updateFormData(data));
 
                                     {values.semester === "I" && (
                                         <>
-                                            <CategorySelectList
+                                            <CategorySelectListUpdate
                                                 label="Select Semester I AEC Subject"
 
                                                 data={extraSubjectData1}
@@ -1645,7 +1912,7 @@ dispatch(updateFormData(data));
 
                                     {values.semester === "II" && (
                                         <>
-                                            <CategorySelectList
+                                            <CategorySelectListUpdate
                                                 label="Select Semester II AEC Subject"
 
                                                 data={extraSubjectData1}
@@ -1666,7 +1933,7 @@ dispatch(updateFormData(data));
 
                                     {values.semester === "III" && (
                                         <>
-                                            <CategorySelectList
+                                            <CategorySelectListUpdate
                                                 label="Select Semester III AEC Subject"
 
                                                 data={extraSubjectData1}
@@ -1687,7 +1954,7 @@ dispatch(updateFormData(data));
 
                                     {values.semester === "IV" && (
                                         <>
-                                            <CategorySelectList
+                                            <CategorySelectListUpdate
                                                 label="Select Semester IV AEC Subject"
 
                                                 data={extraSubjectData1}
@@ -1707,7 +1974,7 @@ dispatch(updateFormData(data));
 
                                     {values.semester === "V" && (
                                         <>
-                                            <CategorySelectList
+                                            <CategorySelectListUpdate
                                                 label="Select Semester V AEC Subject"
 
                                                 data={extraSubjectData1}
@@ -1726,7 +1993,7 @@ dispatch(updateFormData(data));
                                     )}
                                     {values.semester === "VI" && (
                                         <>
-                                            <CategorySelectList
+                                            <CategorySelectListUpdate
                                                 label="Select Semester VI AEC Subject"
 
                                                 data={extraSubjectData1}
@@ -1746,7 +2013,7 @@ dispatch(updateFormData(data));
 
                                     {values.semester === "VII" && (
                                         <>
-                                            <CategorySelectList
+                                            <CategorySelectListUpdate
                                                 label="Select Semester VII AEC Subject"
 
                                                 data={extraSubjectData1}
@@ -1767,7 +2034,7 @@ dispatch(updateFormData(data));
 
                                     {values.semester === "VIII" && (
                                         <>
-                                            <CategorySelectList
+                                            <CategorySelectListUpdate
                                                 label="Select Semester VIII AEC Subject"
 
                                                 data={extraSubjectData1}
@@ -1851,16 +2118,17 @@ dispatch(updateFormData(data));
                         <Formik
                             initialValues={{
 
-                                bankName: '',
-                                acHolderName: '',
-                                accountNumber: '',
-                                ifscNo: '',
-                                branchName: '',
+                                bankName: stateBankData.bankName,
+                                acHolderName: stateBankData.acHolderName,
+                                accountNumber: stateBankData.accountNumber,
+                                ifscNo: stateBankData.ifscNo,
+                                branchName: stateBankData.branchName,
 
 
                             }}
                             validationSchema={step4ValidationSchema}
                             onSubmit={(values) => {
+                                dispatch(saveBankDetails(values));
                                 console.log('Step 4 Values:', values);
                                 handleNextStep();
                                 // alert('Form submitted!');
@@ -1988,52 +2256,53 @@ dispatch(updateFormData(data));
 
                     {currentStep === 5 && (
                         <Formik
-                            initialValues={{
-                                admissionFee: studentData?.stuGender == "Female" ? "Free" : studentData?.stuCategory == "ST" ? "Free" : studentData?.stuCategory == "SC" ? "Free" : ''
+                            initialValues={initialValues}
 
 
-
-                            }}
-                            validationSchema={step4ValidationSchema}
                             onSubmit={(values) => {
+                                dispatch(saveFeeStructure(values));
                                 console.log('Step 4 Values:', values);
+                                handleNextStep();
                                 // alert('Form submitted!');
                             }}
                         >
                             {({ setFieldValue, handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
                                 <View>
                                     <Text style={styles.header}>Fee Structure</Text>
-
-                                    {studentData?.stuCategory == "SC" && studentData?.stuCategory == "ST" && studentData?.stuGender == "Female" &&
-                                        <>
-                                            <Text style={styles.header}>SC, ST, and females condidate are admission free.</Text>
-                                            <View style={styles.inputView}>
-                                                <CustomInput
-                                                    title="Admission Fee"
-                                                    required={true}
-                                                    onChangeText={handleChange('admissionFee')}
-                                                    onBlur={handleBlur('admissionFee')}
-                                                    values={values.admissionFee}
-                                                    placeholder="Enter Migration Issue Date."
-                                                    labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
-                                                    keyboardType={'default'}
-                                                    badgeStyles={styles.badge}
-                                                    editable={false}
-                                                />
-                                                {touched.admissionFee && errors.admissionFee && (
-                                                    <Text style={{ color: 'red' }}>{errors.admissionFee}</Text>
-                                                )}
-                                            </View>
-                                        </>
-
-                                    }
+                                    {/* <CustomInput
+                                            title="Branch Name"
+                                            required={true}
+                                            onChangeText={handleChange('branchName')}
+                                            onBlur={handleBlur('branchName')}
+                                            values={initialValues.admissionFee.toString()}
+                                            placeholder="Enter Branch Name."
+                                            labelsStyle={styles.labelsStyle} inputStyle={styles.inputStyle}
+                                            keyboardType={'default'}
+                                            badgeStyles={styles.badge}
+                                        /> */}
 
 
 
-
-
-
-
+                                    {Object.keys(initialValues).map((key) => (
+                                        <View style={styles.inputView} key={key}>
+                                            {/* {console.log(key,values[key])} */}
+                                            <CustomInput
+                                                title={key.replace(/([A-Z])/g, ' $1') // Split camelCase or PascalCase
+                                                    .trim() // Remove any leading/trailing spaces
+                                                    .replace(/\b\w/g, char => char.toUpperCase())}
+                                                required={true}
+                                                onChangeText={handleChange(key)}
+                                                onBlur={handleBlur(key)}
+                                                values={String(values[key])} // Correct prop name for the current value
+                                                placeholder={`Enter ${key}`}
+                                                labelsStyle={styles.labelsStyle}
+                                                inputStyle={styles.inputStyle}
+                                                keyboardType={'default'}
+                                                badgeStyles={styles.badge}
+                                                editable={false}
+                                            />
+                                        </View>
+                                    ))}
 
                                     <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginBottom: 30 }}>
                                         <View style={{ width: '45%' }}>
@@ -2053,7 +2322,112 @@ dispatch(updateFormData(data));
                         </Formik>
                     )}
 
+                    {currentStep === 6 && (
+                        <Formik
+                            initialValues={{
+                                matricResult: '',
+                                matricProvisional: '',
+                                interResult: '',
+                                interProvisional: '',
+                                interAdmitCard: '',
+                                interRegistrationCard: '',
+                                aadharCard: '',
+                                fatherAadharCard: '',
+                                motherAadharCard: '',
+                                casteCard: '',
+                                incomeCard: '',
+                                residenceCard: '',
+                                photo: '',
+                                CLC: '',
+                                TC: '',
+                                migration: '',
+                                univCard: '',
+                                univRankCard: '',
+                                singnecher:''
+                            }}
+                            validationSchema={validationSchemaUpload}
+                            onSubmit={(values) => {
+                                console.log('Form values:', values);
+                                // Navigate to Success Payment Page
+                                // router.push('/screens/SuccessPaymentPage/');
+                            }}
+                        >
+                            {({ handleSubmit, setFieldValue, errors, touched, values }) => (
+                                <View style={{ paddingLeft: 4, paddingRight: 4, paddingTop: 30 }} >
+                                    <Text style={styles.header}>Upload Documants</Text>
+                                    <Text style={[styles.error,{textAlign:'center'}]}>All PDF files are uploaed max size limit 200KB</Text>
+                                    <Text style={[styles.error,{textAlign:'center'}]}>All Image files are uploaed between 20KB to 50KB</Text>
 
+                                    {/* Form Fields */}
+                                    {Object.keys(validationSchemaUpload.fields).map((fieldName, index) => {
+                                        const matchedItem = items?.find(item => item?.fieldName === fieldName);
+
+                                        return (
+                                            <View key={index}>
+                                                <Text style={[styles.label, { marginBottom: 5 }]}>
+                                                    {fieldName.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} {fieldName == "photo" || fieldName=="singnecher" ? "Image" : "Pdf "}<Text style={styles.badge}>*</Text>
+
+                                                </Text>
+                                                {/* {console.log("fieldName",fieldName)} */}
+                                                <TouchableOpacity style={styles.fileUploadView} onPress={fieldName == "photo" || fieldName=="singnecher" ? () => pickImage(setFieldValue, fieldName) : () => pickDocument(setFieldValue, fieldName)}>
+                                                    <View style={styles.ImageSection}>
+                                                        <Image
+                                                            source={require("../../../assets/images/Add-files-cuate.png")}
+                                                            style={styles.logo}
+                                                            resizeMode="contain"
+                                                        />
+                                                    </View>
+                                                    <Text style={styles.textStyles}>
+                                                        {matchedItem && matchedItem.name && matchedItem.name}
+                                                        {!matchedItem && "Click & Upload"}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                                {touched[fieldName] && errors[fieldName] && <Text style={styles.error}>{errors[fieldName]}</Text>}
+
+
+                                                {fieldName == "photo" && values[fieldName] && (
+
+
+                                                    <View style={{ width: 100, height: 100, justifyContent: 'center', alignItems: 'center' }}>
+                                                        <Image
+                                                            source={{ uri: values[fieldName] }}
+                                                            resizeMode='stretch'
+                                                            style={{ width: '100%', height: '100%' }}
+                                                        />
+                                                 </View>
+                                                )}
+
+{fieldName == "singnecher" && values[fieldName] && (
+
+
+<View style={{ width: 100, height: 100, justifyContent: 'center', alignItems: 'center' }}>
+    <Image
+        source={{ uri: values[fieldName] }}
+        resizeMode='stretch'
+        style={{ width: '100%', height: '100%' }}
+    />
+</View>
+)}
+
+                                                {/* {matchedItem && matchedItem.name && <Text>{matchedItem.name}</Text>} */}
+                                            </View>
+                                        )
+                                    }
+                                    )}
+
+                                    {/* Buttons */}
+                                    <View style={{ justifyContent: 'space-between', flexDirection: 'row', marginBottom: 30 }}>
+                                        <View style={{ width: '45%' }}>
+                                            <CustomButton buttonStyle={styles.buttonStyleBack} buttonStyleText={styles.buttonStyleTextBack} children={'Back'} onClick={handlePreviousStep} />
+                                        </View>
+                                        <View style={{ width: '45%' }}>
+                                            <CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={'Submit & Next'} onClick={handleSubmit} />
+                                        </View>
+                                    </View>
+                                </View>
+                            )}
+                        </Formik>
+                    )}
 
 
 
