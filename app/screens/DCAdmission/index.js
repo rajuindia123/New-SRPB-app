@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, Modal, TouchableOpacity, BackHandler, TextInput, Button, Alert } from 'react-native';
+import { View, Text, ScrollView, Image, Modal, TouchableOpacity, BackHandler, TextInput, Alert } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import { styles } from '../../../styles/screens/DCAdmission';
 import { Divider, RadioButton } from 'react-native-paper';
@@ -29,6 +29,12 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { useStripe } from '@stripe/stripe-react-native';
+import { API_URL } from '../../../src/APIURL';
+import { Button } from 'react-native-paper';
+
+
+
 const step1ValidationSchema = Yup.object().shape({
     candidateName: Yup.string().required('Full Name is required'),
     uan: Yup.string().required('UAN No. is required'),
@@ -198,6 +204,9 @@ const ACAdmission = () => {
     const scrollViewRef = useRef(null);
     const dispatch = useDispatch();
 
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
+
+
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [selectedDate, setSelectedDate] = useState("Select Date Of Birth");
     const [value, setValue] = React.useState('');
@@ -218,6 +227,7 @@ const ACAdmission = () => {
     const [loading, setLoading] = useState(false);
     const [image, setImage] = useState(null);
     const [items, setItems] = useState([]);
+    const [loadingApi,setLoadingApi]=useState(false)
     // const[studentUAN,setStudentUAN]=useState()
     const parts = section.split("-");
 
@@ -492,6 +502,76 @@ const ACAdmission = () => {
             Alert.alert("Error", "An error occurred while picking the image.");
         }
     };
+
+
+
+    
+    const fetchPaymentSheetParams = async () => {
+
+try {
+    const studentAmount=parseFloat(stateFeeData.total)
+    
+        const response = await fetch(`${API_URL}/payment-sheet`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body:JSON.stringify({amount:studentAmount,customerInfo:"Raju"})
+        });
+        const { paymentIntent, ephemeralKey, customer } = await response.json();
+    
+        return {
+          paymentIntent,
+          ephemeralKey,
+          customer,
+        };
+} catch (error) {
+    Alert.alert(`Error something went wrong`);
+}
+        
+      };
+
+
+      const initializePaymentSheet = async () => {
+        // setLoadingApi(true)
+        const {
+          paymentIntent,
+          ephemeralKey,
+          customer,
+        } = await fetchPaymentSheetParams();
+        // setLoadingApi(false)
+        const { error } = await initPaymentSheet({
+          merchantDisplayName: "SRPB College",
+          customerId: customer,
+          customerEphemeralKeySecret: ephemeralKey,
+          paymentIntentClientSecret: paymentIntent,
+          googlePay: true,
+          // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
+          //methods that complete payment after a delay, like SEPA Debit and Sofort.
+          allowsDelayedPaymentMethods: true,
+          defaultBillingDetails: {
+            name: studentData?.stuName,
+          }
+        });
+    //    if (!error) {
+    //        setLoading(true);
+    //     }
+      };
+      const openPaymentSheet = async () => {
+        const { error } = await presentPaymentSheet();
+    
+        if (error) {
+          Alert.alert(`Error code: ${error.code}`, error.message);
+        } else {
+        //   Alert.alert('Success', 'Your order is confirmed!');
+          router.push('/screens/SuccessPaymentPage/')
+        }
+      };
+const paymentHandel=async ()=>{
+        await initializePaymentSheet().then(async ()=>{
+        await openPaymentSheet();
+    })
+}
     // console.log("stateDocumenyUploadData", stateDocumenyUploadData)
     return (
         loading ? <Loader /> :
@@ -2298,8 +2378,8 @@ const ACAdmission = () => {
                                         <View style={styles.inputView} key={key}>
                                             {/* {console.log(key,values[key])} */}
                                             <CustomInput
-                                                title={key.replace(/([A-Z])/g, ' $1') // Split camelCase or PascalCase
-                                                    .trim() // Remove any leading/trailing spaces
+                                                title={key.replace(/([A-Z])/g, ' $1') 
+                                                    .trim() 
                                                     .replace(/\b\w/g, char => char.toUpperCase())}
                                                 required={true}
                                                 onChangeText={handleChange(key)}
@@ -2508,7 +2588,17 @@ const ACAdmission = () => {
                                             <CustomButton buttonStyle={styles.buttonStyleBack} buttonStyleText={styles.buttonStyleTextBack} children={'Back'} onClick={handlePreviousStep} />
                                         </View>
                                         <View style={{ width: '48%' }}>
-                                            <CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={stateFeeData.total == 0 ? 'Submit' : `₹${stateFeeData.total} Pay`} onClick={handleSubmit} />
+
+{stateFeeData.total == 0 ?<CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={'Submit' } onClick={handleSubmit} />:<Button  style={[styles.buttonStyle,{padding:2}]}  mode="contained" onPress={paymentHandel}>
+    {`₹ ${stateFeeData.total} Pay`}
+  </Button>}
+                                            
+  {/* {stateFeeData.total == 0 ?<CustomButton buttonStyle={styles.buttonStyle} buttonStyleText={styles.buttonStyleText} children={'Submit' } onClick={handleSubmit} />:<Button  mode="contained" onPress={() => console.log('Pressed')}>
+    {`₹${stateFeeData.total} Pay`}
+  </Button>}                                   */}
+
+
+
                                         </View>
 
                                     </View>

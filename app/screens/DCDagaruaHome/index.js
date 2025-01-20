@@ -1,11 +1,12 @@
-import { View, Text, ScrollView, TouchableOpacity, SafeAreaView ,Alert,BackHandler} from 'react-native'
-import React from 'react'
+import { View, Text, ScrollView, TouchableOpacity, SafeAreaView, Alert, BackHandler ,ActivityIndicator} from 'react-native'
+import React, { useState } from 'react'
 import AutoImageSlider from '../../components/AutoImageSlider';
 import { styles } from '../../../styles/screens/DCDagarua';
 import NoticeBoardScreen from '../../components/NoticeBoardScreen';
 import { router } from 'expo-router';
 import CustomHeader from '../../components/CustomHeader';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // import AsyncStorage
+
 const images = [
     'https://img.freepik.com/free-vector/college-campus-concept-illustration_114360-10538.jpg',
     'https://img.freepik.com/free-vector/college-students-concept-illustration_114360-10205.jpg',
@@ -15,13 +16,17 @@ const images = [
 ];
 
 const DEDHome = () => {
+
+  
     const handleProfilePress = () => {
         Alert.alert("Notification Pressed!");
-      };
-      const handleLogout = async () => {
-        await AsyncStorage.removeItem("userLoggedIn");
-       router.replace("/"); // Navigate back to login screen
     };
+    const handleLogout = async () => {
+        await AsyncStorage.removeItem("userLoggedIn");
+        router.replace("/"); // Navigate back to login screen
+    };
+
+
    
     return (
         <SafeAreaView >
@@ -38,6 +43,16 @@ const DEDHome = () => {
                     <TouchableOpacity onPress={handleLogout}>
                         <Text>LogOut</Text>
                     </TouchableOpacity>
+                    
+
+
+
+
+
+
+
+
+
                     <TouchableOpacity style={[styles.admissionStyles, { backgroundColor: "#62825D" }]} onPress={() => router.push('/screens/DocReq/')}>
                         <Text style={styles.textAdmission}>Admission Form</Text>
                     </TouchableOpacity>
